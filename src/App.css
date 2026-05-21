@@ -1,0 +1,50 @@
+/* App container */
+
+.app-container {
+  height: 100vh;
+  width: 100%;
+}
+
+/* Page wrapper */
+
+.page-wrapper {
+  padding: 24px;
+}
+
+/* Dashboard cards */
+
+.dashboard-card {
+  border-radius: 8px;
+}
+
+/* Page header */
+
+.page-header {
+  margin-bottom: 24px;
+}
+
+/* Content section */
+
+.content-section {
+  margin-top: 16px;
+}
+
+/* Table container */
+
+.table-container {
+  background: white;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+/* Pipeline stage cards */
+
+.pipeline-stage {
+  text-align: center;
+}
+
+/* Small text */
+
+.text-muted {
+  color: #8c8c8c;
+}

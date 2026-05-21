@@ -1,0 +1,77 @@
+/* 🔥 Global Reset */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 🔥 Full height layout (IMPORTANT for table scroll) */
+html,
+body,
+#root {
+  height: 100%;
+}
+
+/* 🔥 Body Styling */
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+
+  background-color: #f5f7fa;
+  color: #1f1f1f;
+
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+
+  overflow: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-scroll {
+  overflow-y: auto;
+  height: 100%;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #8c8c8c;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.ant-table {
+  background: #ffffff;
+  border-radius: 12px;
+}
+
+.ant-table-container {
+  border-radius: 12px;
+}
+
+.ant-table-header {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
