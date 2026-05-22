@@ -1,11 +1,14 @@
-import { Card, Table, Tag, Button, Space, Modal, Select, Input } from "antd";
+import { Card, Table, Tag, Button, Space, Modal, Select, Input, Typography, Row, Col } from "antd";
 import { useMemo, useState } from "react";
 
+
+
+const { Title, Text } = Typography;
 const PayloadStore = () => {
     const [open, setOpen] = useState(false);
     const [selectedPayload, setSelectedPayload] = useState<any>(null);
-  const [filterField, setFilterField] = useState<string>("");
-  const [filterValue, setFilterValue] = useState("");
+    const [filterField, setFilterField] = useState<string>("");
+    const [filterValue, setFilterValue] = useState("");
 
     const data = [
         {
@@ -38,15 +41,15 @@ const PayloadStore = () => {
         },
     ];
     const filteredData = useMemo(() => {
-  if (!filterField || !filterValue) return data;
+        if (!filterField || !filterValue) return data;
 
-  return data.filter((item: any) =>
-    item[filterField]
-      ?.toString()
-      .toLowerCase()
-      .includes(filterValue.toLowerCase())
-  );
-}, [filterField, filterValue, data]);
+        return data.filter((item: any) =>
+            item[filterField]
+                ?.toString()
+                .toLowerCase()
+                .includes(filterValue.toLowerCase())
+        );
+    }, [filterField, filterValue, data]);
 
     const columns = [
         {
@@ -108,52 +111,60 @@ const PayloadStore = () => {
     ];
 
     return (
-        <div style={{ padding: 16, background: "#f5f7fb" }}>
+        <div style={{ padding: 30, background: "#f5f7fb" }}>
 
-            {/* 🔷 Header */}
-            <Card
-                title="Payload Store"
-                style={{ marginBottom: 12 }}
-            >
-                <p style={{ color: "#64748b" }}>
-                    View all execution payloads and details
-                </p>
+            <div style={{ marginBottom: 16 }}>
+                <Title level={4}>Payload Store</Title>
+                <Text type="secondary">
+                    View and manage all test execution payloads in one place.
+                </Text>
+            </div>
+
+
+            {/* 🔷 Table */}
+            <Card>
+                <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+                    <Col xs={24} sm={12} md={8}>
+                        <Select
+                            placeholder="Select field"
+                            value={filterField || undefined}
+                            onChange={(val: any) => {
+                                setFilterField(val);
+                                setFilterValue("");
+                            }}
+                            allowClear
+                            style={{ width: "100%" }}
+                            options={[
+                                { label: "Execution ID", value: "executionId" },
+                                { label: "Pipeline", value: "pipeline" },
+                                { label: "Environment", value: "env" },
+                                { label: "Module", value: "module" },
+                                { label: "Status", value: "status" }
+                            ]}
+                        />
+                    </Col>
+
+                    <Col xs={24} sm={12} md={8}>
+                        <Input
+                            placeholder="Search value"
+                            value={filterValue}
+                            onChange={(e) => setFilterValue(e.target.value)}
+                        />
+                    </Col>
+                </Row>
+
+                <Table
+                    dataSource={filteredData}
+                    columns={columns}
+                    bordered
+                    size="middle"
+                    pagination={{
+                        pageSize: 5,
+                        responsive: true
+                    }}
+                    scroll={{ x: "max-content" }}
+                />
             </Card>
-
-      {/* 🔷 Table */}
-      <Card>
-        <Space style={{ marginBottom: 16 }}>
-          <Select
-            placeholder="Select field"
-            style={{ width: 180 }}
-            value={filterField || undefined}
-            onChange={(val: any) => {
-              setFilterField(val);
-              setFilterValue("");
-            }}
-            allowClear
-            options={[
-              { label: "Execution ID", value: "executionId" },
-              { label: "Pipeline", value: "pipeline" },
-              { label: "Environment", value: "env" },
-              { label: "Module", value: "module" },
-              { label: "Status", value: "status" },
-            ]}
-          ></Select>
-
-          <Input
-            placeholder="Search value"
-            value={filterValue}
-            onChange={(e) => setFilterValue(e.target.value)}
-            style={{ width: 200 }}
-          />
-        </Space>
-        <Table
-          dataSource={filteredData}
-          columns={columns}
-          pagination={{ pageSize: 5 }}
-        />
-      </Card>
 
             {/* 🔷 Payload Modal */}
             <Modal

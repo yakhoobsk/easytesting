@@ -8,7 +8,8 @@ import {
     Tag,
     Progress,
     Input,
-    Space,
+
+    Typography,
 } from "antd";
 import { useState, useMemo, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
@@ -43,7 +44,7 @@ type TableRow = {
     percent: number;
     status: string;
 };
-
+const { Title, Text } = Typography;
 const TestExecution = () => {
     const dispatch = useAppDispatch();
     const { folderNames, processes } = useAppSelector((state) => state.branch);
@@ -160,87 +161,450 @@ const TestExecution = () => {
     }, [searchText, filterField, filterValue, tableData]);
 
     return (
-        <div style={{ padding: 16, background: "#f5f7fb" }}>
-            <Card title="Execution Setup" style={{ marginBottom: 12 }}>
-                <Row gutter={[12, 12]}>
-                    <Col span={8}>
+        <div style={{ padding: 30, background: "#ffffff" }}>
+            <div style={{ marginBottom: 16 }}>
+                <Title level={4}>Test Execution</Title>
+                <Text type="secondary">
+                    Execute your test processes and monitor results in real-time
+                </Text>
+            </div>
+            <Card
+                title={
+                    <div
+                        style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            fontWeight: 600
+                        }}
+                    >
+                        Execution Setup
+                    </div>
+                }
+
+                style={{
+                    marginBottom: 16,
+
+                    borderRadius: 18,
+
+                    boxShadow:
+                        "0 8px 30px rgba(0,0,0,.06)",
+
+                    border: "none"
+                }}
+            >
+
+                <Row gutter={[16, 16]}>
+
+                    {/* Folder */}
+
+                    <Col
+                        xs={24}
+                        sm={12}
+                        lg={8}
+                    >
+
+                        <Text strong>
+                            Folder
+                        </Text>
+
                         <Select
-                            placeholder="Select Folder"
-                            style={{ width: "100%" }}
-                            value={selectedFolder}
-                            onChange={(val) => setSelectedFolder(val)}
+
+                            placeholder=
+                            "Choose Folder"
+
+                            size="large"
+
+                            style={{
+                                width: "100%",
+                                marginTop: 6
+                            }}
+
+                            value={
+                                selectedFolder
+                            }
+
+                            onChange={
+                                setSelectedFolder
+                            }
+
                             showSearch
-                            optionFilterProp="label"
+
                             allowClear
+
+                            optionFilterProp=
+                            "label"
+
                         >
-                            {flatFolders.map((folder) => (
-                                <Option key={folder.id} value={folder.id} label={folder.name}>
-                                    {folder.name}
-                                </Option>
-                            ))}
+
+                            {
+                                flatFolders.map(
+                                    folder => (
+
+                                        <Option
+
+                                            key={folder.id}
+
+                                            value={folder.id}
+
+                                            label={folder.name}
+
+                                        >
+
+                                            {folder.name}
+
+                                        </Option>
+
+                                    ))
+                            }
+
                         </Select>
+
                     </Col>
 
 
-                    <Col span={8}>
+
+                    {/* Process */}
+
+                    <Col
+                        xs={24}
+                        sm={12}
+                        lg={8}
+                    >
+
+                        <Text strong>
+                            Process
+                        </Text>
+
                         <Select
-                            placeholder="Select Process"
-                            style={{ width: "100%" }}
-                            value={selectedProcess}
-                            onChange={(val) => setSelectedProcess(val)}
-                            disabled={!selectedFolder}
+
+                            placeholder=
+                            "Choose Process"
+
+                            size="large"
+
+                            disabled={
+                                !selectedFolder
+                            }
+
+                            style={{
+                                width: "100%",
+                                marginTop: 6
+                            }}
+
+                            value={
+                                selectedProcess
+                            }
+
+                            onChange={
+                                setSelectedProcess
+                            }
+
                             showSearch
-                            optionFilterProp="label"
+
                             allowClear
+
                         >
-                            {processOptions.map((proc: any) => (
-                                <Option key={proc.componentId} value={proc.componentId} label={proc.name}>
-                                    {proc.name}
-                                </Option>
-                            ))}
+
+                            {
+                                processOptions.map(
+                                    (proc: any) => (
+
+                                        <Option
+
+                                            key={
+                                                proc.componentId
+                                            }
+
+                                            value={
+                                                proc.componentId
+                                            }
+
+                                        >
+
+                                            {proc.name}
+
+                                        </Option>
+
+                                    ))
+                            }
+
                         </Select>
+
                     </Col>
 
 
-                    <Col span={8}>
+
+                    {/* Environment */}
+
+                    <Col
+                        xs={24}
+                        sm={12}
+                        lg={8}
+                    >
+
+                        <Text strong>
+                            Environment
+                        </Text>
+
                         <Select
-                            placeholder="Select Environment"
-                            style={{ width: "100%" }}
-                            value={selectedEnvironment}
-                            onChange={(val) => setSelectedEnvironment(val)}
+
+                            placeholder=
+                            "Choose Environment"
+
+                            size="large"
+
+                            style={{
+                                width: "100%",
+                                marginTop: 6
+                            }}
+
+                            value={
+                                selectedEnvironment
+                            }
+
+                            onChange={
+                                setSelectedEnvironment
+                            }
+
                             showSearch
-                            optionFilterProp="label"
+
                             allowClear
+
                         >
-                            {environments.map((env: any) => (
-                                <Option key={env.id} value={env.id} label={env.name}>
-                                    {env.name}
-                                </Option>
-                            ))}
+
+                            {
+                                environments.map(
+                                    (env: any) => (
+
+                                        <Option
+
+                                            key={env.id}
+
+                                            value={env.id}
+
+                                        >
+
+                                            {env.name}
+
+                                        </Option>
+
+                                    ))
+                            }
+
                         </Select>
+
                     </Col>
 
 
-                    <Col span={16}>
-                        <Input
-                            placeholder="Description (Expected Payload)"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                        />
-                    </Col>
 
+                    {/* Payload Editor */}
 
-                    <Col span={8}>
-                        <Button
-                            type="primary"
-                            block
-                            loading={loading}
-                            onClick={handleRun}
+                    <Col
+                        xs={24}
+                        lg={18}
+                    >
+
+                        <div
+                            style={{
+
+                                padding: 14,
+
+                                background:
+                                    "#f8fafc",
+
+                                borderRadius: 14,
+
+                                border:
+                                    "1px solid #e2e8f0"
+
+                            }}
                         >
-                            Run Execution
-                        </Button>
+
+                            <div
+                                style={{
+
+                                    display: "flex",
+
+                                    justifyContent:
+                                        "space-between",
+
+                                    marginBottom: 10
+
+                                }}
+                            >
+
+                                <Text strong>
+                                    Payload Editor
+                                </Text>
+
+                                <Tag color="blue">
+                                    JSON / XML
+                                </Tag>
+
+                            </div>
+
+
+                            <Input.TextArea
+
+                                value={
+                                    description
+                                }
+
+                                onChange={(e) =>
+                                    setDescription(
+                                        e.target.value
+                                    )
+                                }
+
+                                placeholder={`Paste JSON or XML
+
+JSON:
+{
+ "name":"test"
+}
+
+XML:
+<user>
+ <name>test</name>
+</user>
+`}
+
+                                autoSize={{
+
+                                    minRows: 8,
+
+                                    maxRows: 14
+
+                                }}
+
+                                style={{
+
+                                    fontFamily:
+                                        "monospace",
+
+                                    fontSize: 13,
+
+                                    background:
+                                        "#0f172a",
+
+                                    color: "#e2e8f0",
+
+                                    border:
+                                        "none",
+
+                                    borderRadius: 10,
+
+                                    padding: 14
+
+                                }}
+
+                            />
+
+
+                            <div
+                                style={{
+
+                                    marginTop: 10,
+
+                                    display: "flex",
+
+                                    justifyContent:
+                                        "space-between",
+
+                                    flexWrap: "wrap",
+
+                                    gap: 8
+
+                                }}
+                            >
+
+                                <Text
+                                    type="secondary"
+                                >
+
+                                    Supports:
+                                    JSON • XML
+
+                                </Text>
+
+
+                                <Text
+                                    type="secondary"
+                                >
+
+                                    Characters:
+                                    {description?.length || 0}
+
+                                </Text>
+
+                            </div>
+
+                        </div>
+
                     </Col>
+
+
+
+                    {/* Run Button */}
+
+                    <Col
+                        xs={24}
+                        lg={6}
+                    >
+
+                        <div
+                            style={{
+
+                                height: "100%",
+
+                                display: "flex",
+
+                                alignItems: "center"
+
+                            }}
+                        >
+
+                            <Button
+
+                                type="primary"
+
+                                block
+
+                                size="large"
+
+                                loading={loading}
+
+                                onClick={
+                                    handleRun
+                                }
+
+                                style={{
+
+                                    height: 52,
+
+                                    fontWeight: 700,
+
+                                    borderRadius: 12,
+
+                                    boxShadow:
+                                        "0 8px 20px rgba(22,119,255,.25)"
+
+                                }}
+
+                            >
+
+                                Run Execution
+
+                            </Button>
+
+                        </div>
+
+                    </Col>
+
+
                 </Row>
+
             </Card>
 
             <Card
@@ -265,132 +629,109 @@ const TestExecution = () => {
                 <Progress percent={70} status="active" />
             </Card>
 
-            {/* <Card
-                style={{ ...cardStyle, marginTop: 12, marginBottom: 12 }}
-                title="Pipeline Status"
-                bodyStyle={{ padding: 20 }}
+
+
+            <Card
+                style={{ ...cardStyle, marginTop: 12 }}
+                title="Execution Details"
             >
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                    }}
-                >
-                    {tableData.map((p, i) => {
-                        const status = p.status ? p.status.toLowerCase() : "pending";
-                        const isSuccess = status.includes("success");
-                        const isFailed = status.includes("failed");
+                <Row gutter={[12, 12]} style={{ marginBottom: 16 }}>
+                    <Col xs={24} sm={12} md={8}>
+                        <Select
+                            placeholder="Select field"
+                            value={filterField || undefined}
+                            onChange={(val) => {
+                                setFilterField(val as keyof TableRow);
+                                setFilterValue("");
+                            }}
+                            style={{ width: "100%" }}
+                            allowClear
+                        >
+                            <Select.Option value="env">Environment</Select.Option>
+                            <Select.Option value="total">Total</Select.Option>
+                            <Select.Option value="success">Success</Select.Option>
+                            <Select.Option value="fail">Failed</Select.Option>
+                            <Select.Option value="partiallySuccess">
+                                Partially Success
+                            </Select.Option>
+                            <Select.Option value="partiallyFailed">
+                                Partially Failed
+                            </Select.Option>
+                            <Select.Option value="percent">Pass %</Select.Option>
+                            <Select.Option value="status">Status</Select.Option>
+                        </Select>
+                    </Col>
 
-                        const bg = isSuccess ? "#ecfdf5" : isFailed ? "#fef2f2" : "#fff7ed";
-                        const color = isSuccess ? "#16a34a" : isFailed ? "#ef4444" : "#ea580c";
-
-                        return (
-                            <div key={i} style={{ display: "flex", alignItems: "center" }}>
-                                <div
-                                    style={{
-                                        textAlign: "center",
-                                        padding: "14px 16px",
-                                        borderRadius: 12,
-                                        background: bg,
-                                        minWidth: 150,
-                                    }}
-                                >
-                                    <div style={{ fontSize: 14, fontWeight: 600, color: color }}>
-                                        {p.env}
-                                    </div>
-
-                                    <div
-                                        style={{
-                                            fontSize: 11,
-                                            marginTop: 4,
-                                            color: "#94a3b8",
-                                        }}
-                                    >
-                                        {(p.status || "PENDING").toUpperCase()}
-                                    </div>
-                                </div>
-
-                                {i !== tableData.length - 1 && (
-                                    <span
-                                        style={{
-                                            margin: "0 12px",
-                                            fontSize: 18,
-                                            color: "#94a3b8",
-                                        }}
-                                    >
-                                        →
-                                    </span>
-                                )}
-                            </div>
-                        );
-                    })}
-
-                </div>
-            </Card> */}
-
-            <Card style={{ ...cardStyle, marginTop: 12 }} title="Execution Details">
-                <Space style={{ marginBottom: 16 }} wrap>
-                    <Select
-                        placeholder="Select field"
-                        value={filterField || undefined}
-                        onChange={(val) => {
-                            setFilterField(val as keyof TableRow);
-                            setFilterValue("");
-                        }}
-                        style={{ width: 180 }}
-                        allowClear
-                    >
-                        <Select.Option value="env">Environment</Select.Option>
-                        <Select.Option value="total">Total</Select.Option>
-                        <Select.Option value="success">Success</Select.Option>
-                        <Select.Option value="fail">Failed</Select.Option>
-                        <Select.Option value="partiallySuccess">Partially Success</Select.Option>
-                        <Select.Option value="partiallyFailed">Partially Failed</Select.Option>
-                        <Select.Option value="percent">Pass %</Select.Option>
-                        <Select.Option value="status">Status</Select.Option>
-                    </Select>
-
-                    <Input
-                        placeholder="Search..."
-                        value={searchText}
-                        onChange={(e) => setSearchText(e.target.value)}
-                        allowClear
-                        style={{ width: 200 }}
-                    />
-                </Space>
+                    <Col xs={24} sm={12} md={8}>
+                        <Input
+                            placeholder="Search..."
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            allowClear
+                        />
+                    </Col>
+                </Row>
 
                 <Table
                     dataSource={filteredData}
+                    bordered
+                    size="middle"
                     pagination={false}
+                    scroll={{ x: 1000 }}
                     columns={[
-                        { title: "Environment", dataIndex: "env" },
-                        { title: "Total", dataIndex: "total" },
-                        { title: "Success", dataIndex: "success" },
-                        { title: "Partially Success", dataIndex: "partialSuccess" },
-                        { title: "Failed", dataIndex: "fail" },
-                        { title: "Partially Failed", dataIndex: "partialFailed" },
+                        {
+                            title: "Environment",
+                            dataIndex: "env",
+                            fixed: "left",
+                            width: 180,
+                            ellipsis: true,
+                        },
+                        {
+                            title: "Total",
+                            dataIndex: "total",
+                            width: 100,
+                        },
+                        {
+                            title: "Success",
+                            dataIndex: "success",
+                            width: 100,
+                        },
+                        {
+                            title: "Partially Success",
+                            dataIndex: "partialSuccess",
+                            width: 150,
+                            responsive: ["md"],
+                        },
+                        {
+                            title: "Failed",
+                            dataIndex: "fail",
+                            width: 100,
+                        },
+                        {
+                            title: "Partially Failed",
+                            dataIndex: "partialFailed",
+                            width: 150,
+                            responsive: ["md"],
+                        },
                         {
                             title: "Pass %",
                             dataIndex: "percent",
+                            width: 100,
                             render: (p) => `${p}%`,
                         },
                         {
                             title: "Status",
                             dataIndex: "status",
+                            width: 150,
                             render: (s: string) => {
                                 let color = "orange";
-                                const status = s ? s.replace(/_/g, ' ').toLowerCase() : "pending";
+                                const status = s?.toLowerCase() || "pending";
 
                                 if (status.includes("success")) color = "green";
                                 else if (status.includes("failed")) color = "red";
                                 else if (status.includes("pending")) color = "default";
 
-                                return (
-                                    <Tag color={color}>
-                                        {s ? s.replace(/_/g, ' ').split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ') : "Pending"}
-                                    </Tag>
-                                );
+                                return <Tag color={color}>{s || "Pending"}</Tag>;
                             },
                         },
                     ]}

@@ -7,11 +7,16 @@ import {
     Select,
     Input,
     Space,
+    Typography,
+    Row,
+    Col,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useAppDispatch } from "../redux/hooks";
 import { AuditGet } from "../redux/services/settings/auditServices";
 
+
+const { Title, Text } = Typography;
 interface Log {
     key: string | number;
     user: string;
@@ -179,48 +184,61 @@ const AuditLogs: React.FC = () => {
     };
 
     return (
-        <div style={{ padding: 16, background: "#f5f7fb" }}>
-            {/* 🔷 TABLE */}
-            <Card title="Audit Logs">
+        <div style={{ padding: 30, background: "#f5f7fb" }}>
+
+            <div style={{ marginBottom: 30 }}>
+                <Title level={4}>Audit Logs</Title>
+                <Text type="secondary">
+                    View all changes and actions performed within the system, along with details of what was changed, when, and by whom.
+                </Text>
+            </div>
+            <Card>
                 <Space direction="vertical" style={{ width: "100%" }} size="middle">
-                    <div
-                        style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            alignItems: "center",
-                        }}
-                    >
-                        <Space size="middle">
+
+                    <Row gutter={[12, 12]}>
+                        <Col xs={24} sm={12} md={8}>
                             <Select
                                 placeholder="Filter By"
-                                style={{ width: 180 }}
                                 value={filterField}
                                 onChange={setFilterField}
+                                style={{ width: "100%" }}
                                 options={[
                                     { label: "All", value: "All" },
                                     { label: "User Name", value: "user_name" },
                                     { label: "Action Type", value: "action_type" },
                                     { label: "Module Name", value: "module_name" },
-                                    { label: "User Email", value: "user_mail" },
+                                    { label: "User Email", value: "user_mail" }
                                 ]}
                             />
+                        </Col>
 
+                        <Col xs={24} sm={12} md={10}>
                             <Input
                                 placeholder="Search query..."
                                 value={filterValue}
                                 onChange={(e) => setFilterValue(e.target.value)}
-                                style={{ width: 300, borderRadius: 8 }}
+                                style={{ borderRadius: 8 }}
+                                allowClear
                             />
-                        </Space>
-                    </div>
+                        </Col>
+                    </Row>
 
                     <Table
                         dataSource={logs}
                         columns={columns}
                         loading={fetching}
-                        pagination={{ pageSize: 10 }}
                         rowKey="key"
+                        bordered
+                        size="middle"
+                        pagination={{
+                            pageSize: 10,
+                            responsive: true
+                        }}
+                        scroll={{
+                            x: "max-content"
+                        }}
                     />
+
                 </Space>
             </Card>
 

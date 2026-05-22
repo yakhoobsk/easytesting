@@ -40,26 +40,17 @@ interface Props {
     children: ReactNode;
 }
 
-// const pageTitles: Record<string, string> = {
-//     "/": "Dashboard",
-//     "/test-execution": "Test Execution",
-//     "/payload-store": "Payload Store",
-//     "/ai-testcases": "AI Test Cases",
-//     "/results": "Test Results",
-//     "/tickets": "Tickets",
-//     "/audit-logs": "Audit Logs",
-//     "/settings": "Settings",
-// };
+
 
 export default function MainLayout({ children }: Props): ReactElement {
     const navigate = useNavigate();
     const location = useLocation();
     const screens = useBreakpoint();
-
     const [collapsed, setCollapsed] = useState(false);
     const [mobileOpen, setMobileOpen] = useState(false);
+    const isMobile = screens.xs && !screens.sm;
 
-    const isMobile = !screens.md;
+    const isTablet = (screens.sm || screens.md) && !screens.lg;
 
     const dispatch = useAppDispatch();
     const auth = useAppSelector((state) => state.auth.auth);
@@ -92,8 +83,7 @@ export default function MainLayout({ children }: Props): ReactElement {
         }));
     };
 
-    // const currentTitle =
-    //     pageTitles[location.pathname] || "EasyTesting";
+
 
     const menuItems = [
         { key: "/", icon: <DashboardOutlined />, label: "Dashboard" },
@@ -382,7 +372,12 @@ export default function MainLayout({ children }: Props): ReactElement {
                 <Sider
                     width={260}
                     collapsible
-                    collapsed={collapsed}
+                    collapsed={
+                        screens.md && !screens.lg
+                            ? false      // md shows names
+                            : collapsed
+                    }
+
                     trigger={null}
                     style={{
                         background: "#0F52BA",
@@ -390,15 +385,27 @@ export default function MainLayout({ children }: Props): ReactElement {
                         height: "100vh",
                     }}
                 >
-                    <div style={{ padding: 10 }}>
-                        <Button
-                            type="text"
-                            icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-                            onClick={() => setCollapsed(!collapsed)}
-                            style={{ color: "#fff" }}
-                        />
-                    </div>
+                    {!isTablet && (
+                        <div style={{ padding: 10 }}>
+                            <Button
+                                type="text"
+                                icon={
+                                    collapsed
+                                        ?
+                                        <MenuUnfoldOutlined />
+                                        :
+                                        <MenuFoldOutlined />
+                                }
 
+                                onClick={() =>
+                                    setCollapsed(
+                                        !collapsed
+                                    )
+                                }
+                                style={{ color: "#fff" }}
+                            />
+                        </div>
+                    )}
                     {SidebarContent}
                 </Sider>
             )}
@@ -407,9 +414,19 @@ export default function MainLayout({ children }: Props): ReactElement {
             {isMobile && (
                 <Drawer
                     placement="left"
+                    width={260}
                     open={mobileOpen}
-                    onClose={() => setMobileOpen(false)}
-                    styles={{ body: { padding: 0 } }}
+
+                    onClose={() =>
+                        setMobileOpen(false)
+                    }
+
+                    styles={{
+                        body: {
+                            padding: 0,
+                            background: "#0F52BA"
+                        }
+                    }}
                 >
                     {SidebarContent}
                 </Drawer>
@@ -420,13 +437,27 @@ export default function MainLayout({ children }: Props): ReactElement {
                 <Content
                     style={{
 
-                        background: "#ffffff",
                         borderRadius: 12,
 
                         overflowY: "auto",
                     }}
                 >
-                    {/* <Title level={4}>{currentTitle}</Title> */}
+                    {isMobile && (
+
+                        <Button
+                            icon={<MenuUnfoldOutlined />}
+                            type="text"
+
+                            onClick={() =>
+                                setMobileOpen(true)
+                            }
+
+                            style={{
+                                margin: 10
+                            }}
+                        />
+
+                    )}
                     {children}
                 </Content>
             </Layout>

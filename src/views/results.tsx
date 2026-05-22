@@ -10,6 +10,8 @@ import {
     Button,
     Modal,
     Spin,
+    Col,
+    Row,
 } from "antd";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { ResultFetch, OverallResultsFetch } from "../redux/services/settings/resultServices";
@@ -17,6 +19,7 @@ import type { ColumnsType } from "antd/es/table";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import MetricCard from "../components/metriccard";
+import { motion } from "framer-motion";
 
 const { Title, Text } = Typography;
 
@@ -225,6 +228,22 @@ const Results: React.FC = () => {
         },
     ];
 
+    const progressColor =
+        percent >= 80
+            ? "#52c41a"
+            : percent >= 50
+                ? "#faad14"
+                : "#ff4d4f";
+
+    const statusColor =
+        overallStatus.toUpperCase() === "SUCCESS"
+            ? "success"
+            : overallStatus.toUpperCase() === "FAILED"
+                ? "error"
+                : overallStatus.toUpperCase().includes("PARTIAL")
+                    ? "volcano"
+                    : "warning";
+
     return (
         <div style={{ padding: 20, background: "#fff" }}>
             <div id="pdf-content" style={{ padding: 10, background: "#fff" }}>
@@ -255,11 +274,18 @@ const Results: React.FC = () => {
                         <div
                             style={{
                                 display: "grid",
-                                gridTemplateColumns: "repeat(5, 1fr)",
+
+                                gridTemplateColumns:
+                                    "repeat(auto-fit,minmax(180px,1fr))",
+
                                 gap: 16,
+
                                 marginBottom: 16,
+
+                                width: "100%"
                             }}
                         >
+
                             <MetricCard
                                 title="Total Runs"
                                 value={totalRuns}
@@ -294,133 +320,342 @@ const Results: React.FC = () => {
                                 color="#cf1322"
                                 bg="#fff1f0"
                             />
+
                         </div>
 
                         {/* BOTTOM ROW */}
-                        <div
-                            style={{
-                                padding: "22px 28px",
-                                borderRadius: 16,
-                                background: "#ffffff",
-                                border: "1px solid #f0f0f0",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "space-between",
-                                boxShadow: "0 2px 10px rgba(0,0,0,0.04)",
+
+
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: .5 }}
+                            whileHover={{
+                                y: -4,
+                                boxShadow: "0 12px 30px rgba(0,0,0,.08)"
                             }}
                         >
-                            {/* LEFT SECTION */}
+
                             <div
                                 style={{
-                                    flex: 1,
-                                    paddingRight: 32,
+                                    padding: 24,
+                                    borderRadius: 20,
+                                    background: "#fff",
+                                    display: "flex",
+                                    flexWrap: "wrap",
+                                    gap: 24,
+                                    justifyContent: "space-between",
+                                    alignItems: "center",
+                                    boxShadow: "0 4px 20px rgba(0,0,0,.05)"
                                 }}
                             >
+
+                                {/* LEFT */}
+
                                 <div
                                     style={{
-                                        display: "flex",
-                                        alignItems: "center",
-                                        justifyContent: "space-between",
-                                        marginBottom: 14,
+                                        flex: 1,
+                                        minWidth: 260
                                     }}
                                 >
-                                    <Text
-                                        type="secondary"
-                                        style={{
-                                            fontSize: 14,
-                                            fontWeight: 500,
-                                        }}
-                                    >
-                                        Pass Percentage
-                                    </Text>
 
                                     <div
                                         style={{
-                                            fontSize: 28,
-                                            fontWeight: 700,
-                                            color:
-                                                percent >= 80
-                                                    ? "#52c41a"
-                                                    : percent >= 50
-                                                        ? "#faad14"
-                                                        : "#ff4d4f",
+                                            display: "flex",
+                                            justifyContent: "space-between",
+                                            alignItems: "center",
+                                            marginBottom: 16
                                         }}
                                     >
-                                        {percent}%
+
+                                        <Text
+                                            type="secondary"
+                                            style={{
+                                                fontSize: 15,
+                                                fontWeight: 500
+                                            }}
+                                        >
+
+                                            Pass Percentage
+
+                                        </Text>
+
+
+                                        <motion.div
+
+                                            initial={{
+                                                scale: .5,
+                                                opacity: 0
+                                            }}
+
+                                            animate={{
+                                                scale: 1,
+                                                opacity: 1
+                                            }}
+
+                                            transition={{
+                                                delay: .3
+                                            }}
+
+                                            style={{
+
+                                                fontSize: 38,
+
+                                                fontWeight: 800,
+
+                                                color: progressColor
+
+                                            }}
+
+                                        >
+
+                                            {percent}%
+
+                                        </motion.div>
+
                                     </div>
+
+
+
+                                    <motion.div
+
+                                        initial={{
+                                            width: 0
+                                        }}
+
+                                        animate={{
+                                            width: "100%"
+                                        }}
+
+                                        transition={{
+                                            duration: 1
+                                        }}
+
+                                    >
+
+                                        <Progress
+
+                                            percent={percent}
+
+                                            showInfo={false}
+
+                                            strokeWidth={14}
+
+                                            strokeColor={progressColor}
+
+                                            trailColor="#f3f4f6"
+
+                                        />
+
+                                    </motion.div>
+
+
+                                    <Text
+                                        type="secondary"
+
+                                        style={{
+                                            marginTop: 14,
+                                            display: "block",
+                                            fontSize: 14
+                                        }}
+                                    >
+
+                                        {percent}% execution completed successfully
+
+                                    </Text>
+
                                 </div>
 
-                                <Progress
-                                    percent={percent}
-                                    showInfo={false}
-                                    strokeColor={
-                                        percent >= 80
-                                            ? "#52c41a"
-                                            : percent >= 50
-                                                ? "#faad14"
-                                                : "#ff4d4f"
-                                    }
-                                    trailColor="#f5f5f5"
-                                    strokeWidth={12}
-                                />
-                            </div>
 
-                            {/* RIGHT SECTION */}
-                            <div
-                                style={{
-                                    minWidth: 220,
-                                    paddingLeft: 32,
-                                    borderLeft: "1px solid #f0f0f0",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    justifyContent: "center",
-                                }}
-                            >
-                                <Text
-                                    type="secondary"
-                                    style={{
-                                        fontSize: 14,
-                                        fontWeight: 500,
-                                    }}
-                                >
-                                    Overall Status
-                                </Text>
+
+                                {/* RIGHT */}
 
                                 <div
+
                                     style={{
-                                        marginTop: 16,
+
+                                        flex: 1,
+
+                                        minWidth: 220,
+
+                                        paddingLeft: 24,
+
+                                        borderLeft:
+                                            window.innerWidth > 768
+
+                                                ?
+
+                                                "1px solid #eee"
+
+                                                :
+
+                                                "none"
+
                                     }}
+
                                 >
-                                    <Tag
-                                        color={
-                                            overallStatus.toUpperCase() === "SUCCESS"
-                                                ? "success"
-                                                : overallStatus.toUpperCase() === "FAILED"
-                                                    ? "error"
-                                                    : overallStatus.toUpperCase() === "PARTIALLY FAILED" || overallStatus.toUpperCase() === "PARTIAL FAILED"
-                                                        ? "volcano"
-                                                        : "warning"
-                                        }
+
+                                    <Text
+                                        type="secondary"
+
                                         style={{
-                                            padding: "8px 16px",
-                                            borderRadius: 999,
-                                            fontSize: 14,
-                                            fontWeight: 600,
-                                            border: "none",
-                                            width: "fit-content",
+                                            fontSize: 15
                                         }}
                                     >
-                                        {overallStatus}
-                                    </Tag>
+
+                                        Overall Status
+
+                                    </Text>
+
+
+                                    <motion.div
+
+                                        animate={{
+
+                                            scale: [1, 1.05, 1]
+
+                                        }}
+
+                                        transition={{
+
+                                            repeat: Infinity,
+
+                                            duration: 2
+
+                                        }}
+
+                                        style={{
+                                            marginTop: 16
+                                        }}
+
+                                    >
+
+                                        <Tag
+
+                                            color={statusColor}
+
+                                            style={{
+
+                                                padding:
+                                                    "10px 20px",
+
+                                                fontSize: 15,
+
+                                                fontWeight: 700,
+
+                                                borderRadius: 30,
+
+                                                border: "none"
+
+                                            }}
+
+                                        >
+
+                                            {overallStatus}
+
+                                        </Tag>
+
+                                    </motion.div>
+
+
+
+                                    <div
+                                        style={{
+                                            marginTop: 24
+                                        }}
+                                    >
+
+                                        <Row gutter={[12, 12]}>
+
+                                            <Col span={8}>
+                                                <Text type="secondary">
+                                                    Runs
+                                                </Text>
+
+                                                <div
+                                                    style={{
+                                                        fontSize: 24,
+                                                        fontWeight: 700
+                                                    }}
+                                                >
+
+                                                    {totalRuns}
+
+                                                </div>
+
+                                            </Col>
+
+
+
+                                            <Col span={8}>
+                                                <Text type="secondary">
+                                                    Success
+                                                </Text>
+
+                                                <div
+                                                    style={{
+                                                        fontSize: 24,
+                                                        fontWeight: 700,
+                                                        color: "#52c41a"
+                                                    }}
+                                                >
+
+                                                    {totalPass}
+
+                                                </div>
+
+                                            </Col>
+
+
+
+                                            <Col span={8}>
+                                                <Text type="secondary">
+                                                    Failed
+                                                </Text>
+
+                                                <div
+                                                    style={{
+                                                        fontSize: 24,
+                                                        fontWeight: 700,
+                                                        color: "#ff4d4f"
+                                                    }}
+                                                >
+
+                                                    {totalFail}
+
+                                                </div>
+
+                                            </Col>
+
+                                        </Row>
+
+                                    </div>
+
                                 </div>
+
                             </div>
-                        </div>
+
+                        </motion.div>
                     </Spin>
                 </Card>
 
                 {/* TABLE */}
-                <Card title="Execution Details">
-                    <Table dataSource={data} columns={columns} pagination={false} />
+                <Card
+                    title="Execution Details"
+                    style={{
+                        borderRadius: 16
+                    }}
+                >
+                    <Table
+                        dataSource={data}
+                        columns={columns}
+                        bordered
+                        size="middle"
+                        pagination={false}
+                        scroll={{
+                            x: "max-content"
+                        }}
+                    />
                 </Card>
             </div>
 

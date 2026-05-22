@@ -5,12 +5,15 @@ import {
     Form,
     Input,
     Row,
+    Space,
     Switch,
     Typography,
 } from "antd";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { ISTMCreate, ISTMGet } from "../../redux/services/settings/istmconnecters";
 import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { ApiOutlined, LinkOutlined } from "@ant-design/icons";
 
 const { Text } = Typography;
 
@@ -72,104 +75,353 @@ const ITSMConnectorsPage = () => {
     };
 
     return (
-        <Row gutter={[24, 24]} style={{ padding: 24 }}>
-            <Col span={12}>
-                <Card
-                    title={
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <Text strong>Jira-Tickets</Text>
-                            <Switch
-                                checked={jiraEnabled}
-                                onChange={(checked) => setJiraEnabled(checked)}
-                                size="small"
-                            />
-                        </div>
-                    }
+        <Row gutter={[20, 20]} style={{ padding: 20 }}>
+
+            {/* Jira */}
+
+            <Col xs={24} lg={12}>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: .4 }}
+                    whileHover={{ y: -4 }}
                 >
-                    <Form
-                        form={jiraForm}
-                        layout="vertical"
-                        onFinish={(values) => onFinish(values, "Jira")}
+
+                    <Card
+                        bordered={false}
+
+                        style={{
+                            borderRadius: 20,
+
+                            background:
+                                "linear-gradient(145deg,#fff,#f8fafc)",
+
+                            boxShadow:
+                                "0 10px 30px rgba(0,0,0,.05)"
+                        }}
+
+                        title={
+
+                            <div
+                                style={{
+
+                                    display: "flex",
+
+                                    justifyContent:
+                                        "space-between",
+
+                                    alignItems:
+                                        "center"
+
+                                }}
+                            >
+
+                                <Space>
+
+                                    <ApiOutlined
+                                        style={{
+                                            color: "#1677ff"
+                                        }}
+                                    />
+
+                                    <Text strong>
+                                        Jira Tickets
+                                    </Text>
+
+                                </Space>
+
+
+                                <Switch
+                                    checked={jiraEnabled}
+                                    onChange={
+                                        setJiraEnabled
+                                    }
+                                />
+
+                            </div>
+
+                        }
+
                     >
-                        <Form.Item
-                            name="instance_url"
-                            label="instance_url"
-                            rules={[{ required: true, message: 'Required' }]}
-                        >
-                            <Input placeholder="https://jira.com" />
-                        </Form.Item>
 
-                        <Form.Item
-                            name="username"
-                            label="Username"
-                            rules={[{ required: true, message: 'Required' }]}
+                        <Form
+                            form={jiraForm}
+                            layout="vertical"
+                            onFinish={(v) =>
+                                onFinish(
+                                    v,
+                                    "Jira"
+                                )
+                            }
                         >
-                            <Input placeholder="admin@gmail.com" />
-                        </Form.Item>
 
-                        <Form.Item
-                            name="token"
-                            label="API Token"
-                            rules={[{ required: true, message: 'Required' }]}
-                        >
-                            <Input.Password />
-                        </Form.Item>
+                            <Form.Item
+                                name="instance_url"
+                                label="Instance URL"
+                                rules={[
+                                    {
+                                        required: true,
+                                        message: "Required"
+                                    }
+                                ]}
+                            >
 
-                        <Button type="primary" htmlType="submit" loading={jiraLoading}>
-                            Save Jira
-                        </Button>
-                    </Form>
-                </Card>
+                                <Input
+                                    prefix={<LinkOutlined />}
+                                    placeholder="https://jira.com"
+                                />
+
+                            </Form.Item>
+
+
+
+                            <Form.Item
+                                name="username"
+                                label="Username"
+                                rules={[
+                                    {
+                                        required: true
+                                    }
+                                ]}
+                            >
+
+                                <Input
+                                    placeholder="admin@gmail.com"
+                                />
+
+                            </Form.Item>
+
+
+
+                            <Form.Item
+                                name="token"
+                                label="API Token"
+                                rules={[
+                                    {
+                                        required: true
+                                    }
+                                ]}
+                            >
+
+                                <Input.Password />
+
+                            </Form.Item>
+
+
+
+                            <Button
+                                block
+
+                                type="primary"
+
+                                htmlType="submit"
+
+                                loading={
+                                    jiraLoading
+                                }
+
+                                style={{
+
+                                    height: 42,
+
+                                    borderRadius: 10,
+
+                                    fontWeight: 600
+
+                                }}
+
+                            >
+
+                                Save Jira
+
+                            </Button>
+
+                        </Form>
+
+                    </Card>
+
+                </motion.div>
+
             </Col>
 
-            <Col span={12}>
-                <Card
-                    title={
-                        <div style={{ display: "flex", justifyContent: "space-between" }}>
-                            <Text strong>Esi-Tickets</Text>
-                            <Switch
-                                checked={esiEnabled}
-                                onChange={(checked) => setEsiEnabled(checked)}
-                                size="small"
-                            />
-                        </div>
-                    }
+
+
+
+            {/* ESI */}
+
+            <Col xs={24} lg={12}>
+
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{
+                        delay: .1
+                    }}
+
+                    whileHover={{
+                        y: -4
+                    }}
                 >
-                    <Form
-                        form={esiForm}
-                        layout="vertical"
-                        onFinish={(values) => onFinish(values, "Esi")}
+
+                    <Card
+                        bordered={false}
+
+                        style={{
+
+                            borderRadius: 20,
+
+                            background:
+                                "linear-gradient(145deg,#fff,#f8fafc)",
+
+                            boxShadow:
+                                "0 10px 30px rgba(0,0,0,.05)"
+                        }}
+
+                        title={
+
+                            <div
+                                style={{
+
+                                    display: "flex",
+
+                                    justifyContent:
+                                        "space-between",
+
+                                    alignItems:
+                                        "center"
+
+                                }}
+                            >
+
+                                <Space>
+
+                                    <ApiOutlined
+                                        style={{
+                                            color: "#1677ff"
+                                        }}
+                                    />
+
+                                    <Text strong>
+                                        ESI Tickets
+                                    </Text>
+
+                                </Space>
+
+
+                                <Switch
+                                    checked={
+                                        esiEnabled
+                                    }
+
+                                    onChange={
+                                        setEsiEnabled
+                                    }
+                                />
+
+                            </div>
+
+                        }
+
                     >
-                        <Form.Item
-                            name="instance_url"
-                            label="Instance URL"
-                            rules={[{ required: true, message: 'Required' }]}
-                        >
-                            <Input placeholder="https://esi.com" />
-                        </Form.Item>
 
-                        <Form.Item
-                            name="username"
-                            label="Username"
-                            rules={[{ required: true, message: 'Required' }]}
-                        >
-                            <Input placeholder="admin@gmail.com" />
-                        </Form.Item>
+                        <Form
+                            form={esiForm}
+                            layout="vertical"
 
-                        <Form.Item
-                            name="token"
-                            label="API Token"
-                            rules={[{ required: true, message: 'Required' }]}
+                            onFinish={(v) =>
+                                onFinish(
+                                    v,
+                                    "Esi"
+                                )
+                            }
                         >
-                            <Input.Password />
-                        </Form.Item>
 
-                        <Button type="primary" htmlType="submit" loading={esiLoading}>
-                            Save Esi
-                        </Button>
-                    </Form>
-                </Card>
+                            <Form.Item
+                                name="instance_url"
+                                label="Instance URL"
+                                rules={[
+                                    {
+                                        required: true
+                                    }
+                                ]}
+                            >
+
+                                <Input
+                                    prefix={<LinkOutlined />}
+                                    placeholder="https://esi.com"
+                                />
+
+                            </Form.Item>
+
+
+                            <Form.Item
+                                name="username"
+                                label="Username"
+                                rules={[
+                                    {
+                                        required: true
+                                    }
+                                ]}
+                            >
+
+                                <Input />
+
+                            </Form.Item>
+
+
+                            <Form.Item
+                                name="token"
+                                label="API Token"
+                                rules={[
+                                    {
+                                        required: true
+                                    }
+                                ]}
+                            >
+
+                                <Input.Password />
+
+                            </Form.Item>
+
+
+                            <Button
+                                block
+
+                                type="primary"
+
+                                htmlType="submit"
+
+                                loading={
+                                    esiLoading
+                                }
+
+                                style={{
+
+                                    height: 42,
+
+                                    borderRadius: 10,
+
+
+
+                                    fontWeight: 600
+
+                                }}
+
+                            >
+
+                                Save ESI
+
+                            </Button>
+
+                        </Form>
+
+                    </Card>
+
+                </motion.div>
+
             </Col>
+
         </Row>
     );
 };

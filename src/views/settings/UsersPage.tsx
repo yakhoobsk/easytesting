@@ -1,10 +1,12 @@
 import {
     Avatar,
     Button,
+    Col,
     Form,
     Input,
     Modal,
     Popconfirm,
+    Row,
     Select,
     Space,
     Switch,
@@ -162,111 +164,171 @@ const UsersPage = () => {
     return (
         <>
             <Space direction="vertical" style={{ width: "100%" }} size="large">
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                    }}
-                >
-                    <Space size="middle">
+
+                {/* Filters */}
+                <Row gutter={[12, 12]} align="middle">
+
+                    <Col xs={24} sm={12} md={6}>
                         <Select
                             placeholder="Filter By"
-                            style={{ width: 180 }}
                             value={filterField}
                             onChange={setFilterField}
+                            style={{ width: "100%" }}
                             options={[
                                 { label: "All", value: "All" },
                                 { label: "Name", value: "full_name" },
                                 { label: "Email", value: "user_email" },
                                 { label: "Role", value: "role" },
-                                { label: "Status", value: "status" },
+                                { label: "Status", value: "status" }
                             ]}
                         />
+                    </Col>
 
+                    <Col xs={24} sm={12} md={8}>
                         <Input
                             placeholder="Search query..."
                             value={filterValue}
-                            onChange={(e) => setFilterValue(e.target.value)}
-                            style={{ width: 300, borderRadius: 8 }}
+                            onChange={(e) =>
+                                setFilterValue(e.target.value)
+                            }
+                            style={{ borderRadius: 8 }}
+                            allowClear
                         />
-                    </Space>
+                    </Col>
 
-                    <Button
-                        type="primary"
-                        onClick={() => {
-                            setForm({ status: "Active" });
-                            setOpen(true);
-                        }}
+                    <Col
+                        xs={24}
+                        md={6}
+
                         style={{
-                            borderRadius: 8,
-                            height: 40,
-                            fontWeight: 600,
-                            background: "#2563eb",
+                            marginLeft: "auto"
                         }}
                     >
-                        + Add User
-                    </Button>
-                </div>
+
+                        <Button
+                            block
+                            type="primary"
+
+                            onClick={() => {
+                                setForm({
+                                    status: "Active"
+                                });
+
+                                setOpen(true);
+                            }}
+
+                            style={{
+                                borderRadius: 8,
+                                height: 40,
+                                fontWeight: 600,
+                                background: "#2563eb"
+                            }}
+                        >
+
+                            + Add User
+
+                        </Button>
+
+                    </Col>
+
+                </Row>
+
+
+                {/* Table */}
 
                 <Table
                     dataSource={users}
                     rowKey="key"
                     loading={fetching}
-                    pagination={{ pageSize: 10 }}
+
+                    size="middle"
+
+                    pagination={{
+                        pageSize: 10,
+                        responsive: true
+                    }}
+
+                    scroll={{
+                        x: "max-content"
+                    }}
+
                     columns={[
+
                         {
                             title: "User",
                             key: "user",
+                            width: 250,
+
                             render: (_, record: User) => (
+
                                 <Space size="middle">
+
                                     <Avatar
                                         style={{
                                             backgroundColor: "#eff6ff",
-                                            color: "#3b82f6",
+                                            color: "#3b82f6"
                                         }}
                                     >
                                         {record.name.charAt(0)}
                                     </Avatar>
 
                                     <div>
-                                        <div style={{ fontWeight: 600 }}>
+
+                                        <div
+                                            style={{
+                                                fontWeight: 600
+                                            }}
+                                        >
                                             {record.name}
                                         </div>
 
                                         <div
                                             style={{
                                                 fontSize: 12,
-                                                color: "#64748b",
+                                                color: "#64748b"
                                             }}
                                         >
                                             {record.email}
                                         </div>
+
                                     </div>
+
                                 </Space>
-                            ),
+
+                            )
                         },
+
                         {
                             title: "Role",
                             dataIndex: "role",
+                            width: 120,
+
                             render: (r: string) => (
                                 <Tag color={r === "Admin" ? "blue" : "default"}>
                                     {r}
                                 </Tag>
-                            ),
+                            )
                         },
+
                         {
                             title: "Status",
                             dataIndex: "status",
+                            width: 120
                         },
+
                         {
                             title: "Actions",
+                            width: 160,
                             align: "right",
+
                             render: (_, record: User) => (
+
                                 <Space>
+
                                     <Button
                                         size="small"
                                         type="text"
+
                                         onClick={() => {
                                             setSelectedUser(record);
                                             setForm(record);
@@ -276,19 +338,32 @@ const UsersPage = () => {
                                         Edit
                                     </Button>
 
+
                                     <Popconfirm
                                         title="Delete this user?"
-                                        onConfirm={() => handleDelete(record.key)}
+                                        onConfirm={() =>
+                                            handleDelete(record.key)
+                                        }
                                     >
-                                        <Button size="small" danger type="text">
+
+                                        <Button
+                                            size="small"
+                                            danger
+                                            type="text"
+                                        >
                                             Delete
                                         </Button>
+
                                     </Popconfirm>
+
                                 </Space>
-                            ),
-                        },
+
+                            )
+                        }
+
                     ]}
                 />
+
             </Space>
 
             <Modal

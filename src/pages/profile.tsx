@@ -1,4 +1,4 @@
-import { Card, Row, Col, Avatar, Typography, Button, Space, Spin, Modal, Form, Input } from "antd";
+import { Card, Row, Col, Avatar, Typography, Button, Space, Spin, Modal, Form, Input, Tag } from "antd";
 import { useNavigate } from "react-router-dom";
 import { UserOutlined, LogoutOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
@@ -6,7 +6,8 @@ import { useEffect, useState } from "react";
 import { UserProfileGet, UserProfileUpdate } from "../redux/services/settings/userService";
 import { Logout } from "../redux/services/settings/logoutServices";
 import { clearAuth } from "../redux/slices/authSlice";
-
+import { motion } from "framer-motion";
+import { MailOutlined, SafetyOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
@@ -87,93 +88,328 @@ const ProfilePage = () => {
   };
 
   return (
-    <Row justify="center" style={{ marginTop: 40 }}>
-      <Col xs={24} sm={22} md={20} lg={18} xl={14}>
-        <Card style={{ borderRadius: 12, padding: "24px" }}>
-          <Row justify="space-between" align="middle" style={{ marginBottom: 20 }}>
-            <Col>
-              <Title level={3} style={{ margin: 0 }}>
-                Profile
-              </Title>
-            </Col>
-            <Col>
-              <Space>
-                <Button type="primary" onClick={openUpdateModal}>Update</Button>
-                <Button onClick={() => navigate("/reset-password")}>Change Password</Button>
-              </Space>
-            </Col>
-          </Row>
+    <Row justify="center" style={{ padding: 10, minHeight: "100vh" }}>
+      <Col xs={24} sm={24} md={24} lg={22} xl={20}>
 
-          <Spin spinning={loading}>
-            <Row gutter={[24, 24]} justify="center" align="middle">
-              <Col xs={24} sm={8} style={{ textAlign: "center" }}>
-                <Avatar size={140} style={{ backgroundColor: "#e6e6e6" }} icon={<UserOutlined />} />
-              </Col>
-              <Col xs={24} sm={16}>
-                <Row gutter={[16, 16]}>
-                  <Col span={12}>
-                    <Text strong>First Name :</Text> <Text>{profileData?.First_name || "-"}</Text>
-                  </Col>
-                  <Col span={12}>
-                    <Text strong>Last Name :</Text> <Text>{profileData?.Last_name || "-"}</Text>
-                  </Col>
-                  <Col span={12}>
-                    <Text strong>Role Name :</Text> <Text>{profileData?.Role || "-"}</Text>
-                  </Col>
-                  <Col span={12}>
-                    <Text strong>Email :</Text> <Text>{profileData?.User_Email || "-"}</Text>
-                  </Col>
-                </Row>
-              </Col>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
 
-              <Col span={24} style={{ textAlign: "center", marginTop: 20 }}>
-                <Button type="primary" danger icon={<LogoutOutlined />} onClick={handleLogout}>
-                  Logout
-                </Button>
-              </Col>
-            </Row>
-          </Spin>
-        </Card>
+          <Card
+            bordered={false}
+            style={{
+              borderRadius: 24,
+              overflow: "hidden",
+              boxShadow: "0 12px 40px rgba(0,0,0,.08)",
+              width: "100%"
+            }}
+          >
+
+            {/* Header */}
+
+            <div
+              style={{
+                background: "linear-gradient(135deg,#1677ff,#69b1ff)",
+                padding: 30,
+                color: "#fff",
+                margin: "-24px -24px 30px"
+              }}
+            >
+
+              <Row
+                justify="space-between"
+                align="middle"
+                gutter={[16, 16]}
+              >
+
+                <Col>
+                  <Title
+                    level={2}
+                    style={{
+                      color: "#fff",
+                      margin: 0
+                    }}
+                  >
+                    My Profile
+                  </Title>
+
+                  <Text style={{ color: "#e6f4ff" }}>
+                    Manage account settings
+                  </Text>
+                </Col>
+
+
+                <Col>
+
+                  <Space wrap>
+
+                    <Button
+                      type="primary"
+                      style={{ color: "#1677ff", background: "#e6f4ff", border: "none" }}
+                      ghost
+
+                      onClick={
+                        openUpdateModal
+                      }
+                    >
+                      Update Profile
+                    </Button>
+
+
+                    <Button
+                      onClick={() =>
+                        navigate(
+                          "/reset-password"
+                        )
+                      }
+                    >
+                      Change Password
+                    </Button>
+
+                  </Space>
+
+                </Col>
+
+              </Row>
+
+            </div>
+
+
+
+            <Spin spinning={loading}>
+
+              <Row
+                gutter={[30, 30]}
+                align="middle"
+              >
+
+                {/* Avatar */}
+
+                <Col
+                  xs={24}
+                  md={8}
+                  style={{
+                    textAlign: "center"
+                  }}
+                >
+
+                  <motion.div
+                    whileHover={{
+                      scale: 1.05
+                    }}
+                  >
+
+                    <Avatar
+
+                      size={150}
+
+                      icon={<UserOutlined />}
+
+                      style={{
+
+                        background:
+                          "#f0f5ff",
+
+                        color:
+                          "#1677ff",
+
+                        border:
+                          "6px solid #fff",
+
+                        boxShadow:
+                          "0 10px 30px rgba(0,0,0,.08)"
+
+                      }}
+
+                    />
+
+                  </motion.div>
+
+
+                  <Title
+                    level={4}
+                    style={{
+                      marginTop: 16
+                    }}
+                  >
+
+                    {
+                      profileData?.First_name
+                    }
+
+                    {" "}
+
+                    {
+                      profileData?.Last_name
+                    }
+
+                  </Title>
+
+
+                  <Tag color="blue">
+
+                    {
+                      profileData?.Role
+                    }
+
+                  </Tag>
+
+                </Col>
+
+
+
+                {/* Info */}
+
+                <Col xs={24} md={16}>
+
+                  <Row gutter={[16, 20]}>
+
+                    <Col xs={24} sm={12}>
+                      <Card size="small">
+                        <UserOutlined /> First Name
+                        <div>
+                          {profileData?.First_name || "-"}
+                        </div>
+                      </Card>
+                    </Col>
+
+                    <Col xs={24} sm={12}>
+                      <Card size="small">
+                        <UserOutlined /> Last Name
+                        <div>
+                          {profileData?.Last_name || "-"}
+                        </div>
+                      </Card>
+                    </Col>
+
+                    <Col xs={24} sm={12}>
+                      <Card size="small">
+                        <SafetyOutlined /> Role
+                        <div>
+                          {profileData?.Role || "-"}
+                        </div>
+                      </Card>
+                    </Col>
+
+                    <Col xs={24} sm={12}>
+                      <Card size="small">
+                        <MailOutlined /> Email
+                        <div>
+                          {profileData?.User_Email || "-"}
+                        </div>
+                      </Card>
+                    </Col>
+
+                  </Row>
+
+
+                  <Button
+
+                    danger
+
+                    type="primary"
+
+                    icon={<LogoutOutlined />}
+
+                    onClick={
+                      handleLogout
+                    }
+
+                    style={{
+                      marginTop: 30,
+                      borderRadius: 10
+                    }}
+                  >
+
+                    Logout
+
+                  </Button>
+
+                </Col>
+
+              </Row>
+
+            </Spin>
+
+          </Card>
+
+        </motion.div>
+
       </Col>
+
+
+
+      {/* Modal */}
 
       <Modal
         title="Update Profile"
         open={isModalOpen}
-        onCancel={() => setIsModalOpen(false)}
+        onCancel={() =>
+          setIsModalOpen(false)
+        }
         footer={null}
         centered
       >
+
         <Form
           form={form}
           layout="vertical"
           onFinish={handleUpdate}
         >
+
           <Form.Item
             name="first_Name"
             label="First Name"
-            rules={[{ required: true, message: "Please enter your first name" }]}
+            rules={[
+              {
+                required: true,
+                message:
+                  "Required"
+              }
+            ]}
           >
+
             <Input size="large" />
+
           </Form.Item>
+
 
           <Form.Item
             name="last_Name"
             label="Last Name"
-            rules={[{ required: true, message: "Please enter your last name" }]}
+            rules={[
+              {
+                required: true
+              }
+            ]}
           >
+
             <Input size="large" />
+
           </Form.Item>
 
-          <Form.Item style={{ marginBottom: 0, textAlign: "right" }}>
-            <Space>
-              <Button onClick={() => setIsModalOpen(false)}>Cancel</Button>
-              <Button type="primary" htmlType="submit" loading={updateLoading}>
-                Save Changes
-              </Button>
-            </Space>
-          </Form.Item>
+
+          <Button
+            block
+
+            type="primary"
+
+            htmlType="submit"
+
+            loading={
+              updateLoading
+            }
+          >
+
+            Save Changes
+
+          </Button>
+
         </Form>
+
       </Modal>
+
     </Row>
   );
 };

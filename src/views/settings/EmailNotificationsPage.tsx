@@ -1,9 +1,10 @@
-import { Space, Switch, Button, Modal, Form, Select, List, Typography, Card, Spin } from "antd";
+import { Space, Switch, Button, Modal, Form, Select, List, Typography, Spin, Avatar, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { PlusOutlined, MailOutlined } from "@ant-design/icons";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { EmailnotificatsGet, EmailNotificationCreate, EmailNotificationUpdate } from "../../redux/services/settings/emailnotificationServices";
-
+import { motion } from "framer-motion";
+import { BellOutlined } from "@ant-design/icons";
 
 import { UserMailGet } from "../../redux/services/settings/userService";
 
@@ -87,54 +88,349 @@ const EmailNotificationsPage = () => {
 
     return (
         <div style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                <Title level={4} style={{ margin: 0 }}>Email Notifications</Title>
-                <Button
-                    type="primary"
-                    icon={<PlusOutlined />}
-                    onClick={showModal}
-                    style={{ borderRadius: '6px' }}
+
+            <div
+
+                style={{
+                    borderRadius: 20,
+
+                }}
+            >
+
+
+                <div
+                    style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                        flexWrap: "wrap",
+                        gap: 12,
+                        marginBottom: 24
+                    }}
                 >
-                    Create
-                </Button>
-            </div>
 
-            <Card style={{ borderRadius: '12px', border: '1px solid #f0f0f0' }}>
+                    {/* Left */}
+
+                    <Space size="middle">
+
+                        <div
+                            style={{
+                                width: 42,
+                                height: 42,
+                                borderRadius: 12,
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center"
+                            }}
+                        >
+                            <BellOutlined
+                                style={{
+                                    color: "#1677ff",
+                                    fontSize: 20
+                                }}
+                            />
+                        </div>
+
+
+                        <div>
+
+                            <Title
+                                level={4}
+                                style={{
+                                    margin: 0
+                                }}
+                            >
+                                Notifications
+                            </Title>
+
+                            <Text
+                                type="secondary"
+                                style={{
+                                    fontSize: 12
+                                }}
+                            >
+                                Manage alert emails
+                            </Text>
+
+                        </div>
+
+                    </Space>
+
+
+
+                    {/* Right */}
+
+                    <Space wrap>
+
+                        <Tag
+                            color="blue"
+                            style={{
+                                padding: "4px 10px",
+                                borderRadius: 20,
+                                fontWeight: 600
+                            }}
+                        >
+                            {localNotifications.length} Emails
+                        </Tag>
+
+
+                        <Button
+
+                            type="primary"
+
+                            icon={<PlusOutlined />}
+
+                            onClick={showModal}
+
+                            style={{
+
+                                borderRadius: 10,
+
+                                height: 38,
+
+                                fontWeight: 600
+
+                            }}
+
+                        >
+
+                            Create
+
+                        </Button>
+
+                    </Space>
+
+                </div>
+
+
+
                 {loading ? (
-                    <div style={{ textAlign: 'center', padding: '40px' }}>
-                        <Spin tip="Loading notifications..." />
-                    </div>
-                ) : (
-                    <List
-                        itemLayout="horizontal"
-                        dataSource={localNotifications}
-                        renderItem={(item: any) => {
-                            const emailVal = item.recipients || item.email || item.email_id;
-                            const isActive = item.is_enabled === 1 || item.status === 1 || item.is_active === 1;
-                            return (
-                                <List.Item
-                                    actions={[
-                                        <Switch
-                                            key="active-toggle"
-                                            checked={isActive}
-                                            onChange={(checked) => handleToggle(checked, item)}
-                                            checkedChildren="Active"
-                                            unCheckedChildren="In-Active"
-                                        />
-                                    ]}
-                                >
-                                    <List.Item.Meta
-                                        avatar={<MailOutlined style={{ fontSize: '20px', color: '#1890ff', marginTop: '4px' }} />}
-                                        title={<Text strong>{emailVal}</Text>}
-                                        description={<Text type="secondary">Receive alerts at this email address</Text>}
-                                    />
-                                </List.Item>
-                            );
-                        }}
-                    />
-                )}
-            </Card>
 
+                    <div
+                        style={{
+                            textAlign: "center",
+                            padding: 50
+                        }}
+                    >
+
+                        <Spin
+                            size="large"
+                            tip="Loading notifications..."
+                        />
+
+                    </div>
+
+                ) : (
+
+                    <List
+
+                        dataSource={
+                            localNotifications
+                        }
+
+                        renderItem={(
+                            item: any,
+                            index: number
+                        ) => {
+
+                            const emailVal =
+                                item.recipients
+                                ||
+                                item.email
+                                ||
+                                item.email_id;
+
+
+                            const isActive =
+
+                                item.is_enabled === 1 ||
+
+                                item.status === 1 ||
+
+                                item.is_active === 1;
+
+
+                            return (
+
+                                <motion.div
+
+                                    initial={{
+                                        opacity: 0,
+                                        x: -20
+                                    }}
+
+                                    animate={{
+                                        opacity: 1,
+                                        x: 0
+                                    }}
+
+                                    transition={{
+                                        delay: index * .08
+                                    }}
+
+                                >
+
+                                    <List.Item
+
+                                        style={{
+
+                                            padding:
+                                                "16px",
+
+                                            borderRadius:
+                                                14,
+
+                                            marginBottom:
+                                                12,
+
+                                            background:
+                                                "#fff",
+
+                                            boxShadow:
+                                                "0 2px 12px rgba(0,0,0,.04)",
+
+                                            flexWrap:
+                                                "wrap"
+
+                                        }}
+
+                                        actions={[
+
+                                            <Switch
+
+                                                key="toggle"
+
+                                                checked={
+                                                    isActive
+                                                }
+
+                                                onChange={(
+                                                    checked
+                                                ) =>
+
+                                                    handleToggle(
+                                                        checked,
+                                                        item
+                                                    )
+
+                                                }
+
+                                                checkedChildren=
+                                                "ON"
+
+                                                unCheckedChildren=
+                                                "OFF"
+
+                                            />
+
+                                        ]}
+
+                                    >
+
+                                        <List.Item.Meta
+
+                                            avatar={
+
+                                                <Avatar
+
+                                                    style={{
+
+                                                        background:
+                                                            "#e6f4ff",
+
+                                                        color:
+                                                            "#1677ff"
+
+                                                    }}
+
+                                                    icon={
+                                                        <MailOutlined />
+                                                    }
+
+                                                />
+
+                                            }
+
+                                            title={
+
+                                                <div
+                                                    style={{
+                                                        display: "flex",
+                                                        gap: 10,
+                                                        flexWrap: "wrap"
+                                                    }}
+                                                >
+
+                                                    <Text strong>
+
+                                                        {emailVal}
+
+                                                    </Text>
+
+
+                                                    <Tag
+                                                        color={
+                                                            isActive
+
+                                                                ?
+
+                                                                "green"
+
+                                                                :
+
+                                                                "red"
+                                                        }
+                                                    >
+
+                                                        {
+
+                                                            isActive
+
+                                                                ?
+
+                                                                "ACTIVE"
+
+                                                                :
+
+                                                                "INACTIVE"
+
+                                                        }
+
+                                                    </Tag>
+
+                                                </div>
+
+                                            }
+
+                                            description={
+
+                                                <Text
+                                                    type="secondary"
+                                                >
+
+                                                    Receive alerts
+                                                    and execution
+                                                    notifications
+
+                                                </Text>
+
+                                            }
+
+                                        />
+
+                                    </List.Item>
+
+                                </motion.div>
+
+                            );
+
+                        }}
+
+                    />
+
+                )}
+
+            </div>
             <Modal
                 title={<Title level={5}>Configure Email Notification</Title>}
                 open={isModalVisible}
