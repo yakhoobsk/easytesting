@@ -3,6 +3,7 @@ import UsersPage from "./UsersPage";
 import EnvironmentsPage from "./EnvironmentsPage";
 import ITSMConnectorsPage from "./ITSMConnectorsPage";
 import EmailNotificationsPage from "./EmailNotificationsPage";
+import StatusRange from "./percentagePage";
 
 
 const { TabPane } = Tabs;
@@ -48,8 +49,10 @@ const Settingspage = () => {
                     <TabPane tab="Users" key="1">
                         <UsersPage />
                     </TabPane>
-
-                    <TabPane tab="Environments" key="2">
+                    <TabPane tab="Status Configuration" key="2">
+                        <StatusRange />
+                    </TabPane>
+                    <TabPane tab="Environments" key="3">
                         <EnvironmentsPage />
                     </TabPane>
 
