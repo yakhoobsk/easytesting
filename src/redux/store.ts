@@ -1,12 +1,9 @@
 import { configureStore } from '@reduxjs/toolkit'
 import userSlice from './slices/settings/userSlice'
 import authSlice from './slices/authSlice'
-
 import { persistStore, persistReducer } from "redux-persist"
 import storage from "redux-persist/lib/storage"
-
 import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER, } from "redux-persist"
-
 import { authTransform } from '../utils/authTransform'
 import piplinesSlice from './slices/settings/piplinesSlice'
 import branchSlice from './slices/settings/branchSlice'
@@ -22,6 +19,7 @@ import EmailNotificationSlice from './slices/settings/emailnotificationSlice'
 import BoomiConfigSlice from './slices/settings/boomiConfigrationSlice'
 import environmentSlice from './slices/settings/environmentSlice'
 import resultSlice from './slices/settings/resultSlice'
+import StatusSlice from './slices/settings/statusconfigSlice'
 
 const storageEngine = (storage as any).default || storage;
 const authPersistConfig = {
@@ -49,7 +47,8 @@ export const store = configureStore({
     email: EmailNotificationSlice.reducer,
     boomiConfig: BoomiConfigSlice.reducer,
     environment: environmentSlice.reducer,
-    result: resultSlice.reducer
+    result: resultSlice.reducer,
+    status: StatusSlice.reducer
   },
 
   middleware: (getDefaultMiddleware) =>

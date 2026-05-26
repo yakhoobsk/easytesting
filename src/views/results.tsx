@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Card,
     Table,
@@ -20,6 +20,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import MetricCard from "../components/metriccard";
 import { motion } from "framer-motion";
+import AppPagination from "../components/AppPagination";
 
 const { Title, Text } = Typography;
 
@@ -79,11 +80,12 @@ const Results: React.FC = () => {
     const { resultData, overallResults, loading } = useAppSelector((state) => state.result);
     const [open, setOpen] = useState(false);
     const [selectedRow, setSelectedRow] = useState<ResultType | null>(null);
+    const [pagination, setPagination] = useState({ page: 1, limit: 10 });
 
-    React.useEffect(() => {
+    useEffect(() => {
         dispatch(ResultFetch());
-        dispatch(OverallResultsFetch());
-    }, [dispatch]);
+        dispatch(OverallResultsFetch(pagination));
+    }, [dispatch, pagination]);
 
     // STATUS FUNCTION
     const getStatus = (pass: number, fail: number) => {
@@ -243,6 +245,23 @@ const Results: React.FC = () => {
                 : overallStatus.toUpperCase().includes("PARTIAL")
                     ? "volcano"
                     : "warning";
+
+    const handlePagination = async (page: number, limit: number) => {
+        setPagination({ page, limit });
+
+        try {
+            await dispatch(
+                OverallResultsFetch({
+
+                    pagination: { page, limit },
+                })
+            ).unwrap();
+        } catch (err) {
+            console.error("Pagination error:", err);
+        } finally {
+            console.warn("Pagination completed");
+        }
+    };
 
     return (
         <div style={{ padding: 20, background: "#fff" }}>
@@ -656,6 +675,13 @@ const Results: React.FC = () => {
                             x: "max-content"
                         }}
                     />
+                    <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
+
+                        <AppPagination
+                            totalRecords={overallResults?.totalRecords || 0}
+                            onChange={handlePagination}
+                        />
+                    </div>
                 </Card>
             </div>
 

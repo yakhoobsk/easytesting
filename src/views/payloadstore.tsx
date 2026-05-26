@@ -1,5 +1,8 @@
 import { Card, Table, Tag, Button, Space, Modal, Select, Input, Typography, Row, Col } from "antd";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { ExecutionDetailsFetch } from "../redux/services/settings/dashboardServices";
+import { useAppDispatch, useAppSelector } from "../redux/hooks";
+import AppPagination from "../components/AppPagination";
 
 
 
@@ -9,37 +12,60 @@ const PayloadStore = () => {
     const [selectedPayload, setSelectedPayload] = useState<any>(null);
     const [filterField, setFilterField] = useState<string>("");
     const [filterValue, setFilterValue] = useState("");
+    const dispatch = useAppDispatch();
+    const { executionDetails } = useAppSelector((state) => state.dashboard);
+    const [pagination, setPagination] = useState({ page: 1, limit: 10 });
 
-    const data = [
-        {
-            key: 1,
-            executionId: "EXE001",
-            pipeline: "Pipeline A",
-            env: "DEV",
-            module: "API",
-            status: "Success",
-            time: "10:30 AM",
-            payload: {
-                pipeline: "Pipeline A",
-                env: "DEV",
-                module: "API",
-            },
-        },
-        {
-            key: 2,
-            executionId: "EXE002",
-            pipeline: "Pipeline B",
-            env: "TEST",
-            module: "UI",
-            status: "Failed",
-            time: "11:00 AM",
-            payload: {
-                pipeline: "Pipeline B",
-                env: "TEST",
-                module: "UI",
-            },
-        },
-    ];
+    useEffect(() => {
+        dispatch(ExecutionDetailsFetch({ payload: { search_by_filter: "All", search: "" }, pagination }));
+    }, [dispatch]);
+
+
+    const data =
+        (
+            executionDetails?.Results
+
+            ||
+
+            executionDetails?.results
+
+            ||
+
+            []
+
+        )
+
+            .map(
+
+                (item: any, index: number) => ({
+
+                    key: item.id || index,
+
+                    executionId: item.execution_id,
+
+                    pipeline: item.process_name,
+
+                    env: item.environment_name,
+
+                    module: item.step_name === "NA" ? "-" : item.step_name,
+
+                    status: item.status ? item.status.replace("_", " ") : "Pending",
+
+                    time: item.created_date,
+
+                    payload: {
+                        actualPayload: JSON.parse(item.actual_payload || "{}"),
+
+                        expectedPayload: JSON.parse(item.expected_payload || "{}"),
+
+                        matchPercentage: item.match_percentage,
+
+                        resultId: item.result_id
+
+                    }
+                })
+
+            );
     const filteredData = useMemo(() => {
         if (!filterField || !filterValue) return data;
 
@@ -57,7 +83,7 @@ const PayloadStore = () => {
             dataIndex: "executionId",
         },
         {
-            title: "Pipeline",
+            title: "process Name",
             dataIndex: "pipeline",
         },
         {
@@ -67,26 +93,57 @@ const PayloadStore = () => {
                 <Tag color="blue">{env}</Tag>
             ),
         },
-        {
-            title: "Module",
-            dataIndex: "module",
-        },
+
         {
             title: "Status",
             dataIndex: "status",
-            render: (s: string) => (
-                <Tag
-                    color={
-                        s === "Success"
-                            ? "green"
-                            : s === "Failed"
-                                ? "red"
-                                : "orange"
-                    }
-                >
-                    {s}
-                </Tag>
-            ),
+
+            render: (s: string) => {
+
+                const status =
+                    s?.replaceAll(
+                        "_",
+                        " "
+                    )
+                        .toUpperCase();
+
+                let color = "default";
+
+                if (
+                    status === "SUCCESS"
+                )
+                    color = "green";
+
+                else if (
+                    status ===
+                    "PARTIAL SUCCESS"
+                )
+                    color = "gold";
+
+                else if (
+                    status ===
+                    "PARTIAL FAILED"
+                )
+                    color = "orange";
+
+                else if (
+                    status ===
+                    "FAILED"
+                )
+                    color = "red";
+
+                return (
+
+                    <Tag color={color}>
+
+                        {status}
+
+                    </Tag>
+
+                );
+
+            }
+
         },
         {
             title: "Time",
@@ -109,6 +166,26 @@ const PayloadStore = () => {
             ),
         },
     ];
+
+    const handlePagination = async (page: number, limit: number) => {
+        setPagination({ page, limit });
+
+        try {
+            await dispatch(
+                ExecutionDetailsFetch({
+                    payload: {
+                        search_by_filter: "All",
+                        search: "",
+                    },
+                    pagination: { page, limit },
+                })
+            ).unwrap();
+        } catch (err) {
+            console.error("Pagination error:", err);
+        } finally {
+            console.warn("Pagination completed");
+        }
+    };
 
     return (
         <div style={{ padding: 30, background: "#f5f7fb" }}>
@@ -158,12 +235,16 @@ const PayloadStore = () => {
                     columns={columns}
                     bordered
                     size="middle"
-                    pagination={{
-                        pageSize: 5,
-                        responsive: true
-                    }}
+                    pagination={false}
                     scroll={{ x: "max-content" }}
                 />
+                <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
+
+                    <AppPagination
+                        totalRecords={executionDetails?.totalResults || 0}
+                        onChange={handlePagination}
+                    />
+                </div>
             </Card>
 
             {/* 🔷 Payload Modal */}
@@ -171,17 +252,134 @@ const PayloadStore = () => {
                 open={open}
                 onCancel={() => setOpen(false)}
                 footer={null}
-                title="Payload Details"
+                closable={false}
+                width={900}
+                title={
+                    <div
+                        style={{
+                            display: "flex",
+                            justifyContent: "space-between",
+                            alignItems: "center"
+                        }}
+                    >
+                        <span>Payload Details</span>
+
+                        <Tag
+                            color={
+                                selectedPayload?.matchPercentage === "100.00"
+                                    ? "green"
+                                    : selectedPayload?.matchPercentage > 50
+                                        ? "orange"
+                                        : "red"
+                            }
+                        >
+                            Match  {selectedPayload?.matchPercentage}%
+                        </Tag>
+                    </div>
+                }
             >
-                <pre
+
+                <Row gutter={[20, 20]}>
+
+                    {/* Expected Payload */}
+
+                    <Col xs={24} md={12}>
+
+                        <Card
+                            title="Expected Payload"
+                            style={{
+                                borderRadius: 14,
+                                background: "#fafafa",
+                                height: "100%"
+                            }}
+                        >
+
+                            <pre
+                                style={{
+                                    margin: 0,
+                                    maxHeight: 350,
+                                    overflow: "auto",
+                                    whiteSpace: "pre-wrap",
+                                    wordBreak: "break-word",
+                                    fontSize: 13
+                                }}
+                            >
+
+                                {JSON.stringify(
+                                    selectedPayload?.expectedPayload,
+                                    null,
+                                    2
+                                )}
+
+                            </pre>
+
+                        </Card>
+
+                    </Col>
+
+
+
+                    {/* Actual Payload */}
+
+                    <Col xs={24} md={12}>
+
+                        <Card
+                            title="Actual Payload"
+                            style={{
+                                borderRadius: 14,
+                                background: "#f6ffed",
+                                height: "100%"
+                            }}
+                        >
+
+                            <pre
+                                style={{
+                                    margin: 0,
+                                    maxHeight: 350,
+                                    overflow: "auto",
+                                    whiteSpace: "pre-wrap",
+                                    wordBreak: "break-word",
+                                    fontSize: 13
+                                }}
+                            >
+
+                                {JSON.stringify(
+                                    selectedPayload?.actualPayload,
+                                    null,
+                                    2
+                                )}
+
+                            </pre>
+
+                        </Card>
+
+                    </Col>
+
+                </Row>
+
+
+
+                <div
                     style={{
-                        background: "#f1f5f9",
-                        padding: 12,
-                        borderRadius: 6,
+                        marginTop: 20,
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center"
                     }}
                 >
-                    {JSON.stringify(selectedPayload, null, 2)}
-                </pre>
+
+                    <Text type="secondary">
+                        Result ID:
+                        {" "}
+                        {selectedPayload?.resultId}
+                    </Text>
+
+                    <Tag color="blue">
+                        Execution Compared
+                    </Tag>
+
+                </div>
+
             </Modal>
         </div>
     );

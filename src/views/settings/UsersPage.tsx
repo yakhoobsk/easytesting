@@ -17,89 +17,48 @@ import {
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { UserCreate, UserDelete, UserEdit, UserGet, UserMailGet } from "../../redux/services/settings/userService";
+import AppPagination from "../../components/AppPagination";
 
 
 const { Option } = Select;
 
 interface User {
     key: number;
-    name: string;
+    full_name: string;
     role: string;
-    email?: string;
-    status?: string;
+    user_email?: string;
+    is_status?: boolean;
 }
 
 const UsersPage = () => {
-    const [users, setUsers] = useState<User[]>([]);
     const dispatch = useAppDispatch();
-
     const { auth } = useAppSelector((state) => state.auth);
     const { UserMail } = useAppSelector((state) => state.user);
-
-    const [fetching, setFetching] = useState(false);
-
     const [filterField, setFilterField] = useState<string>("All");
     const [filterValue, setFilterValue] = useState("");
-
     const [open, setOpen] = useState(false);
     const [editOpen, setEditOpen] = useState(false);
-
     const [form, setForm] = useState<any>({});
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
-
-    const fetchUsers = (
-        filterFieldParam = "All",
-        filterValueParam = ""
-    ) => {
-        setFetching(true);
-
-        const payload = {
-            search_by_filter: filterFieldParam,
-            search: filterValueParam,
-        };
-
-        dispatch(
-            UserGet({
-                payload,
-                pagination: { page: 1, limit: 100 },
-            })
-        ).then((res: any) => {
-            setFetching(false);
-
-            const data =
-                res.payload?.Results ||
-                (Array.isArray(res.payload) ? res.payload[0] : []);
-
-            if (Array.isArray(data)) {
-                const fetchedUsers = data.map((u: any, idx: number) => ({
-                    key: u.user_id || u.id || idx,
-                    name: u.full_name || u.name,
-                    role: u.role || "User",
-                    email: u.user_email || u.email,
-                    status:
-                        u.is_status === 1 ||
-                            u.is_status === "1" ||
-                            u.Status === true ||
-                            u.Status === "true" ||
-                            u.status === "Active"
-                            ? "Active"
-                            : "Inactive",
-                }));
-
-                setUsers(fetchedUsers);
-            } else {
-                setUsers([]);
-            }
-        });
-    };
+    const [pagination, setPagination] = useState({ page: 1, limit: 100 });
+    const users = useAppSelector((state) => state.user?.userGet);
 
     const fetchUserMails = () => {
         dispatch(UserMailGet({}));
     };
 
     useEffect(() => {
-        fetchUsers(filterField, filterValue);
-        fetchUserMails();
+        const payload = {
+            search_by_filter: filterField,
+            search: filterValue,
+        }
+        dispatch(
+            UserGet({
+                payload,
+                pagination: pagination,
+            })
+        ),
+            fetchUserMails();
     }, [dispatch, filterField, filterValue]);
 
     const handleAdd = () => {
@@ -118,7 +77,15 @@ const UsersPage = () => {
 
         dispatch(UserCreate({ payload })).then((res: any) => {
             if (res.payload?.Response_Status === "Success") {
-                fetchUsers(filterField, filterValue);
+                dispatch(
+                    UserGet({
+                        payload: {
+                            search_by_filter: filterField,
+                            search: filterValue,
+                        },
+                        pagination: pagination,
+                    })
+                );
 
                 setOpen(false);
                 setForm({});
@@ -144,7 +111,15 @@ const UsersPage = () => {
 
         dispatch(UserEdit(payload)).then((res: any) => {
             if (res.payload?.Response_Status === "Success") {
-                fetchUsers(filterField, filterValue);
+                dispatch(
+                    UserGet({
+                        payload: {
+                            search_by_filter: filterField,
+                            search: filterValue,
+                        },
+                        pagination: pagination,
+                    })
+                );
 
                 setEditOpen(false);
                 setForm({});
@@ -155,9 +130,37 @@ const UsersPage = () => {
     const handleDelete = (userId: string | number) => {
         dispatch(UserDelete({ user_id: userId })).then((res: any) => {
             if (res.payload?.Response_Status === "Success") {
-                fetchUsers(filterField, filterValue);
+                dispatch(
+                    UserGet({
+                        payload: {
+                            search_by_filter: filterField,
+                            search: filterValue,
+                        },
+                        pagination: pagination,
+                    })
+                );
             }
         });
+    };
+
+    const handlePagination = async (page: number, limit: number) => {
+        setPagination({ page, limit });
+
+        try {
+            await dispatch(
+                UserGet({
+                    payload: {
+                        search_by_filter: "All",
+                        search: "",
+                    },
+                    pagination: { page, limit },
+                })
+            ).unwrap();
+        } catch (err) {
+            console.error("Pagination error:", err);
+        } finally {
+            console.warn("Pagination completed");
+        }
     };
 
 
@@ -237,16 +240,12 @@ const UsersPage = () => {
                 {/* Table */}
 
                 <Table
-                    dataSource={users}
+                    dataSource={users?.Results || []}
                     rowKey="key"
-                    loading={fetching}
 
                     size="middle"
 
-                    pagination={{
-                        pageSize: 10,
-                        responsive: true
-                    }}
+                    pagination={false}
 
                     scroll={{
                         x: "max-content"
@@ -269,7 +268,7 @@ const UsersPage = () => {
                                             color: "#3b82f6"
                                         }}
                                     >
-                                        {record.name.charAt(0)}
+                                        {record.full_name.charAt(0)}
                                     </Avatar>
 
                                     <div>
@@ -279,7 +278,7 @@ const UsersPage = () => {
                                                 fontWeight: 600
                                             }}
                                         >
-                                            {record.name}
+                                            {record.full_name}
                                         </div>
 
                                         <div
@@ -288,7 +287,7 @@ const UsersPage = () => {
                                                 color: "#64748b"
                                             }}
                                         >
-                                            {record.email}
+                                            {record.user_email}
                                         </div>
 
                                     </div>
@@ -304,7 +303,7 @@ const UsersPage = () => {
                             width: 120,
 
                             render: (r: string) => (
-                                <Tag color={r === "Admin" ? "blue" : "default"}>
+                                <Tag color={r === "Admin" ? "blue" : "blue"}>
                                     {r}
                                 </Tag>
                             )
@@ -312,8 +311,13 @@ const UsersPage = () => {
 
                         {
                             title: "Status",
-                            dataIndex: "status",
-                            width: 120
+                            dataIndex: "is_status",
+                            width: 120,
+                            render: (status: number) => (
+                                <Tag color={status === 1 ? "green" : "red"}>
+                                    {status === 1 ? "Active" : "Inactive"}
+                                </Tag>
+                            )
                         },
 
                         {
@@ -366,6 +370,13 @@ const UsersPage = () => {
 
             </Space>
 
+            <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
+
+                <AppPagination
+                    totalRecords={users?.totalResults || 0}
+                    onChange={handlePagination}
+                />
+            </div>
             <Modal
                 open={open}
                 title="Create User"

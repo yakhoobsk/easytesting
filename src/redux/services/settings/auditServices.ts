@@ -1,20 +1,36 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { boomiApi, urlGenarator } from "../commonAxios";
 
-interface pagnation {
-    limit: number;
-    page: number;
-}
+
+
+
+// export const AuditGet = createAsyncThunk(
+//     "Audit/get",
+//     async (
+//         { payload, pagination }: { payload: any; pagination: any },
+//         { rejectWithValue }
+//     ) => {
+//         try {
+//             const response = await boomiApi.post(urlGenarator(`/ws/rest/Easytesting/audit/get_all_logs`, pagination), payload);
+
+//             return response.data;
+//         } catch (error: any) {
+//             return rejectWithValue(
+//                 error.response?.data?.message || "Fetch failed"
+//             );
+//         }
+//     }
+// );
 
 
 export const AuditGet = createAsyncThunk(
     "Audit/get",
     async (
-        { Payload, pagnation }: { Payload: any; pagnation: pagnation },
+        { payload, pagination }: { payload: any; pagination: any },
         { rejectWithValue }
     ) => {
         try {
-            const response = await boomiApi.post(urlGenarator(`/ws/rest/Easytesting/audit/get_all_logs`, pagnation), Payload);
+            const response = await boomiApi.post(urlGenarator("/ws/rest/Easytesting/audit/get_all_logs", pagination), payload);
 
             return response.data;
         } catch (error: any) {
@@ -24,4 +40,3 @@ export const AuditGet = createAsyncThunk(
         }
     }
 );
-

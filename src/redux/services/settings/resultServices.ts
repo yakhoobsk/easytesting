@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { boomiApi } from "../commonAxios";
+import { boomiApi, urlGenarator } from "../commonAxios";
 
 export const ResultFetch = createAsyncThunk(
     "result/fetch",
@@ -17,9 +17,9 @@ export const ResultFetch = createAsyncThunk(
 
 export const OverallResultsFetch = createAsyncThunk(
     "result/overallResults",
-    async (_, { rejectWithValue }) => {
+    async (pagination: any, { rejectWithValue }) => {
         try {
-            const response = await boomiApi.post("/ws/rest/Easytesting/result/overalResults", {});
+            const response = await boomiApi.post(urlGenarator("/ws/rest/Easytesting/result/overallResults", pagination));
             return response.data;
         } catch (error: any) {
             return rejectWithValue(

@@ -15,7 +15,8 @@ import { useState, useMemo, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import { foldersGet, processGet } from "../redux/services/settings/branchServices";
 import { EnvironmentFetch } from "../redux/services/settings/environmentService";
-import { ExecutionDetailsFetch } from "../redux/services/settings/dashboardServices";
+import { ComparisonCreate, ExecutionCreate, ExecutionDetailsFetch } from "../redux/services/settings/dashboardServices";
+import AppPagination from "../components/AppPagination";
 
 
 
@@ -54,11 +55,13 @@ const TestExecution = () => {
     const [selectedProcess, setSelectedProcess] = useState<string | null>(null);
     const [selectedEnvironment, setSelectedEnvironment] = useState<string | null>(null);
     const [description, setDescription] = useState("");
+    const [pagination, setPagination] = useState({ page: 1, limit: 10 });
+    const { auth } = useAppSelector((state) => state.auth);
 
     useEffect(() => {
         dispatch(foldersGet({ payload: {} }));
         dispatch(EnvironmentFetch());
-        dispatch(ExecutionDetailsFetch({ payload: { search_by_filter: "All", search: "" } }));
+        dispatch(ExecutionDetailsFetch({ payload: { search_by_filter: "All", search: "" }, pagination }));
     }, [dispatch]);
 
     useEffect(() => {
@@ -83,7 +86,6 @@ const TestExecution = () => {
 
 
 
-    const [loading, setLoading] = useState(false);
     const [searchText, setSearchText] = useState("");
     const [filterField, setFilterField] = useState<keyof TableRow | "">("");
     const [filterValue, setFilterValue] = useState("");
@@ -99,10 +101,7 @@ const TestExecution = () => {
         return "Partially Success";
     };
 
-    const handleRun = () => {
-        setLoading(true);
-        setTimeout(() => setLoading(false), 2000);
-    };
+
 
     const cardStyle = {
         borderRadius: 12,
@@ -159,6 +158,76 @@ const TestExecution = () => {
 
         return temp;
     }, [searchText, filterField, filterValue, tableData]);
+
+
+
+    const handlePagination = async (page: number, limit: number) => {
+        setPagination({ page, limit });
+
+        try {
+            await dispatch(
+                ExecutionDetailsFetch({
+                    payload: {
+                        search_by_filter: "All",
+                        search: "",
+                    },
+                    pagination: { page, limit },
+                })
+            ).unwrap();
+        } catch (err) {
+            console.error("Pagination error:", err);
+        } finally {
+            console.warn("Pagination completed");
+        }
+    };
+
+
+    const handleExecuted = () => {
+
+        const selectedFolderName =
+            flatFolders.find(
+                (f) => f.id === selectedFolder
+            )?.name || "";
+
+        const selectedProcessName =
+            processOptions.find(
+                (p: any) =>
+                    p.componentId === selectedProcess
+            )?.name || "";
+
+        const selectedEnvironmentData =
+            environments.find(
+                (env: any) =>
+                    env.id === selectedEnvironment
+            );
+
+        const payload = {
+            folder: selectedFolderName,
+            process: selectedProcessName,
+
+            environment_name:
+                selectedEnvironmentData?.name || "",
+
+            environment_id:
+                selectedEnvironmentData?.id || "",
+
+            processId:
+                selectedProcess || "",
+
+            userMail:
+                auth?.user_email || "",
+
+            expectedPayload:
+                description || "",
+        };
+        dispatch(ExecutionCreate(payload)).unwrap()
+        const response = {
+            User_Email: auth?.user_email || "",
+        }
+        dispatch(ComparisonCreate(response)).unwrap()
+
+        dispatch(ExecutionDetailsFetch({ payload: { search_by_filter: "All", search: "" }, pagination }))
+    }
 
     return (
         <div style={{ padding: 30, background: "#ffffff" }}>
@@ -566,18 +635,10 @@ XML:
                         >
 
                             <Button
-
                                 type="primary"
-
                                 block
-
                                 size="large"
-
-                                loading={loading}
-
-                                onClick={
-                                    handleRun
-                                }
+                                onClick={handleExecuted}
 
                                 style={{
 
@@ -736,6 +797,13 @@ XML:
                         },
                     ]}
                 />
+                <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
+
+                    <AppPagination
+                        totalRecords={executionDetails?.totalResults || 0}
+                        onChange={handlePagination}
+                    />
+                </div>
             </Card>
         </div>
     );

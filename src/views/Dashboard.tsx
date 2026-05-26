@@ -10,7 +10,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         dispatch(DashboardGet({}));
-        dispatch(ExecutionDetailsFetch({ payload: { search_by_filter: "All", search: "" } }));
+        dispatch(ExecutionDetailsFetch({ payload: { search_by_filter: "All", search: "" }, pagination: { page: 1, limit: 100 } }));
     }, [dispatch]);
 
     const getExecutionStatus = (pass: number, fail: number) => {

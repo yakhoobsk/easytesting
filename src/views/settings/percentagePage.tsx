@@ -2,6 +2,10 @@ import { Card, Row, Col, Form, Tag, InputNumber, Button } from "antd";
 import { Formik } from "formik";
 import * as Yup from "yup";
 import { motion } from "framer-motion";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { useEffect } from "react";
+import { StatusGet, StatusUpdate } from "../../redux/services/settings/statusConfigService";
+import { showSnackbar } from "../../utils/snackbar";
 
 type Status =
     | "Success"
@@ -19,14 +23,6 @@ interface FormValues {
     ranges: Range[];
 }
 
-const initialValues: FormValues = {
-    ranges: [
-        { status: "Success", minPercentage: null, maxPercentage: null },
-        { status: "Partially Success", minPercentage: null, maxPercentage: null },
-        { status: "Partially Failed", minPercentage: null, maxPercentage: null },
-        { status: "Failed", minPercentage: null, maxPercentage: null }
-    ]
-};
 
 const colors: Record<Status, string> = {
     Success: "green",
@@ -61,129 +57,82 @@ const validationSchema = Yup.object({
                             ) >= (
                                     this.parent.minPercentage ?? 0
                                 );
-
                         }
                     )
-
             })
         )
-
-
 
         .test(
             "duplicate",
             "Duplicate ranges not allowed",
-
             (ranges) => {
-
                 if (!ranges)
                     return true;
-
                 const seen =
                     new Set();
-
                 for (
                     const r
                     of ranges
                 ) {
-
                     const key =
                         `${r.minPercentage}-${r.maxPercentage}`;
-
                     if (
                         seen.has(key)
                     )
                         return false;
-
                     seen.add(key);
-
                 }
-
                 return true;
-
             }
-
         )
-
-
 
         .test(
             "overlap",
             "Ranges overlap",
 
             (ranges) => {
-
                 if (!ranges)
                     return true;
-
                 const sorted =
                     [...ranges]
-
                         .sort(
                             (a, b) =>
-
                                 (a.minPercentage ?? 0)
-
                                 -
-
                                 (b.minPercentage ?? 0)
                         );
-
                 for (
                     let i = 0;
-
                     i <
                     sorted.length - 1;
-
                     i++
                 ) {
-
                     if (
-
                         (sorted[i]
                             .maxPercentage ?? 0)
-
                         >=
-
                         (sorted[i + 1]
                             .minPercentage ?? 0)
-
                     ) {
-
                         return false;
-
                     }
-
                 }
-
                 return true;
-
             }
-
         )
-
-
 
         .test(
             "continuous",
-
             "Ranges must cover continuously from 0 to 100",
-
             (ranges) => {
-
                 if (!ranges)
                     return true;
-
                 const sorted =
                     [...ranges]
-
                         .sort(
                             (a, b) =>
-
                                 (a.minPercentage ?? 0)
-
                                 -
-
                                 (b.minPercentage ?? 0)
                         );
 
@@ -194,71 +143,153 @@ const validationSchema = Yup.object({
                     sorted[
                     sorted.length - 1
                     ];
-
                 if (
                     (first.minPercentage ?? 0)
                     !==
                     0
                 )
                     return false;
-
                 if (
                     (last.maxPercentage ?? 0)
                     !==
                     100
                 )
                     return false;
-
-
                 for (
                     let i = 0;
-
                     i <
                     sorted.length - 1;
-
                     i++
                 ) {
-
                     const current =
                         sorted[i];
 
                     const next =
                         sorted[i + 1];
-
                     if (
-
                         (current.maxPercentage ?? 0)
-
                         + 1
-
                         !==
-
                         (next.minPercentage ?? 0)
-
                     ) {
-
                         return false;
-
                     }
-
                 }
-
                 return true;
-
             }
-
         )
 
 });
 
 export default function StatusConfig() {
+    const status = useAppSelector((state) => state.status.status);
+    const dispatch = useAppDispatch();
+    const { auth } = useAppSelector((state) => state.auth);
+
+    useEffect(() => {
+        dispatch(StatusGet({}));
+    }, [dispatch])
+
+    const mappedValues: FormValues = {
+
+        ranges:
+
+            status?.records?.length
+                ?
+                status.records.map(
+                    (item: any) => ({
+                        status: item.status === "PartiallySuccess" ? "Partially Success" : item.status === "PartiallyFailed" ? "Partially Failed" : item.status,
+
+                        minPercentage:
+                            item.minpercentage,
+
+                        maxPercentage:
+                            item.maxpercentage
+
+                    })
+                )
+
+                :
+
+                [
+                    {
+                        status: "Success",
+                        minPercentage: null,
+                        maxPercentage: null
+                    },
+                    {
+                        status: "Partially Success",
+                        minPercentage: null,
+                        maxPercentage: null
+                    },
+                    {
+                        status: "Partially Failed",
+                        minPercentage: null,
+                        maxPercentage: null
+                    },
+                    {
+                        status: "Failed",
+                        minPercentage: null,
+                        maxPercentage: null
+                    }
+                ]
+
+    };
+
 
     return (
 
         <Formik<FormValues>
-            initialValues={initialValues}
+            enableReinitialize
+            initialValues={mappedValues}
             validationSchema={validationSchema}
-            onSubmit={(v) => console.log(v)}
+            onSubmit={async (values) => {
+
+                const payload = {
+
+                    status_id: status?.status_id,
+
+                    records: values.ranges.map(
+                        (item) => ({
+                            status:
+                                item.status
+                                    === "Partially Success"
+                                    ?
+                                    "PartiallySuccess"
+                                    :
+                                    item.status === "Partially Failed"
+                                        ? "PartiallyFailed"
+                                        :
+                                        item.status,
+                            minpercentage:
+                                item.minPercentage,
+
+                            maxpercentage:
+                                item.maxPercentage
+
+                        })
+                    ),
+                    updated_by: auth?.User_Email
+
+                };
+
+                try {
+
+                    dispatch(StatusUpdate(payload)).unwrap();
+                    dispatch(StatusGet({}));
+
+                }
+
+                catch {
+
+                    showSnackbar(
+                        "error",
+                        "Something went wrong"
+                    );
+
+                }
+
+            }}
         >
             {({
 
