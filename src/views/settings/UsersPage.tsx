@@ -332,16 +332,24 @@ const UsersPage = () => {
                                     <Button
                                         size="small"
                                         type="text"
-
                                         onClick={() => {
                                             setSelectedUser(record);
-                                            setForm(record);
+
+                                            setForm({
+                                                name: record.full_name,
+                                                email: record.user_email,
+                                                role: record.role,
+                                                status:
+                                                    Number(record.is_status) === 1
+                                                        ? "Active"
+                                                        : "Inactive",
+                                            });
+
                                             setEditOpen(true);
                                         }}
                                     >
                                         Edit
                                     </Button>
-
 
                                     <Popconfirm
                                         title="Delete this user?"

@@ -675,7 +675,9 @@ const Results: React.FC = () => {
                             x: "max-content"
                         }}
                     />
-                    <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
+                    <div
+                        data-html2canvas-ignore="true"
+                        style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
 
                         <AppPagination
                             totalRecords={overallResults?.totalRecords || 0}
@@ -688,7 +690,11 @@ const Results: React.FC = () => {
             {/* ACTIONS */}
             <Divider />
             <Space>
-                <Button onClick={downloadReport} type="primary">Download Report</Button>
+                <Button
+                    data-html2canvas-ignore="true"
+                    onClick={downloadReport} type="primary"
+                >
+                    Download Report</Button>
             </Space>
 
             {/* MODAL */}

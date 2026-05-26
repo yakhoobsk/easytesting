@@ -19,7 +19,7 @@ export const OverallResultsFetch = createAsyncThunk(
     "result/overallResults",
     async (pagination: any, { rejectWithValue }) => {
         try {
-            const response = await boomiApi.post(urlGenarator("/ws/rest/Easytesting/result/overallResults", pagination));
+            const response = await boomiApi.post(urlGenarator("/ws/rest/Easytesting/result/overalResults", pagination));
             return response.data;
         } catch (error: any) {
             return rejectWithValue(
