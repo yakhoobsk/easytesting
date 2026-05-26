@@ -297,8 +297,7 @@ export default function StatusConfig() {
                 errors,
                 setFieldValue,
                 handleSubmit,
-                isValid,
-                dirty
+
 
             }) => (
 
@@ -535,7 +534,6 @@ export default function StatusConfig() {
                             htmlType="submit"
                             type="primary"
                             size="large"
-                            disabled={!(dirty && isValid)}
                             style={{
                                 borderRadius: 10,
                                 padding: "0 28px",
