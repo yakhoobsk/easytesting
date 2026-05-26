@@ -48,13 +48,11 @@ const EmailNotificationsPage = () => {
             email: values.email,
             status: values.status ? 1 : 0,
         };
-        dispatch(EmailNotificationCreate(payload)).then((action: any) => {
-            if (action.meta.requestStatus === 'fulfilled') {
-                dispatch(EmailnotificatsGet({ payload: {} }));
-                setIsModalVisible(false);
-                form.resetFields();
-            }
-        });
+        dispatch(EmailNotificationCreate(payload)).unwrap();
+        dispatch(EmailnotificatsGet({ payload: {} })).unwrap();
+        setIsModalVisible(false)
+        form.resetFields();
+
     };
 
     const handleToggle = (checked: boolean, item: any) => {
