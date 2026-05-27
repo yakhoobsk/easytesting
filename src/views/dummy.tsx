@@ -9,7 +9,6 @@ import {
   Table,
   Tag,
   Modal,
-  Popconfirm,
   Form,
   Row,
   Col,
@@ -18,7 +17,7 @@ import {
 } from "antd"
 import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import { UserGet, UserCreate, UserEdit, UserMailGet, UserDelete } from "../redux/services/settings/userService";
+import { UserGet, UserCreate, UserEdit, UserMailGet } from "../redux/services/settings/userService";
 
 const { TabPane } = Tabs;
 const { Option } = Select;
@@ -152,13 +151,7 @@ const Dummy = () => {
   };
 
   /* 🔥 DELETE USER */
-  const handleDelete = (userId: string | number) => {
-    dispatch(UserDelete({ user_id: userId })).then((res: any) => {
-      if (res.payload?.Response_Status === "Success") {
-        fetchUsers(filterField, filterValue);
-      }
-    });
-  };
+
 
   return (
     <div style={{ padding: "24px 40px", background: "#f8fafc", minHeight: "100vh" }}>
@@ -281,16 +274,7 @@ const Dummy = () => {
                           >
                             Edit
                           </Button>
-                          <Popconfirm
-                            title="Delete this user?"
-                            onConfirm={() => handleDelete(record.key)}
-                            okText="Yes"
-                            cancelText="No"
-                          >
-                            <Button size="small" danger type="text">
-                              Delete
-                            </Button>
-                          </Popconfirm>
+
                         </Space>
                       ),
                     },
