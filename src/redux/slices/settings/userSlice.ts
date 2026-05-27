@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { UserProfileGet, UserGet, UserMailGet, UserProfileUpdate, UserEdit, UserDelete } from "../../services/settings/userService";
+import { UserProfileGet, UserGet, UserMailGet, UserProfileUpdate, UserEdit } from "../../services/settings/userService";
 
 interface AuthState {
   loading: boolean;
@@ -95,17 +95,7 @@ const userSlice = createSlice({
         state.error = action.payload;
       })
 
-      .addCase(UserDelete.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(UserDelete.fulfilled, (state) => {
-        state.loading = false;
-      })
-      .addCase(UserDelete.rejected, (state, action: any) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
+
 
   }
 });

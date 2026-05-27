@@ -65,25 +65,6 @@ export const UserEdit = createAsyncThunk("user/edit", async (payload: any, { rej
 }
 );
 
-export const UserDelete = createAsyncThunk("user/delete", async (deletePayload: any, { rejectWithValue }) => {
-  try {
-    const payload = {
-      user_id: deletePayload.user_id,
-      is_status: 0
-    };
-    const response = await boomiApi.put("/ws/rest/Easytesting/User/Status_Data_Update", payload);
-    if (response.data.Response_Status === "Failure") {
-      showSnackbar("error", response.data?.UI_Display_Message || "Delete failed");
-    } else if (response.data.Response_Status === "Success") {
-      showSnackbar("success", response.data?.UI_Display_Message || "User deleted successfully");
-    }
-    return response.data;
-  } catch (error: any) {
-    return rejectWithValue(error.response?.data?.message || "Delete failed");
-  }
-}
-);
-
 
 
 export const UserMailGet = createAsyncThunk(

@@ -5,7 +5,6 @@ import {
     Form,
     Input,
     Modal,
-    Popconfirm,
     Row,
     Select,
     Space,
@@ -16,7 +15,7 @@ import {
 
 import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
-import { UserCreate, UserDelete, UserEdit, UserGet, UserMailGet } from "../../redux/services/settings/userService";
+import { UserCreate, UserEdit, UserGet, UserMailGet } from "../../redux/services/settings/userService";
 import AppPagination from "../../components/AppPagination";
 
 
@@ -127,21 +126,7 @@ const UsersPage = () => {
         });
     };
 
-    const handleDelete = (userId: string | number) => {
-        dispatch(UserDelete({ user_id: userId })).then((res: any) => {
-            if (res.payload?.Response_Status === "Success") {
-                dispatch(
-                    UserGet({
-                        payload: {
-                            search_by_filter: filterField,
-                            search: filterValue,
-                        },
-                        pagination: pagination,
-                    })
-                );
-            }
-        });
-    };
+
 
     const handlePagination = async (page: number, limit: number) => {
         setPagination({ page, limit });
@@ -182,7 +167,7 @@ const UsersPage = () => {
                                 { label: "Name", value: "full_name" },
                                 { label: "Email", value: "user_email" },
                                 { label: "Role", value: "role" },
-                                { label: "Status", value: "status" }
+
                             ]}
                         />
                     </Col>
@@ -268,7 +253,7 @@ const UsersPage = () => {
                                             color: "#3b82f6"
                                         }}
                                     >
-                                        {record.full_name.charAt(0)}
+                                        {record?.full_name?.charAt(0) || "U"}
                                     </Avatar>
 
                                     <div>
@@ -351,22 +336,7 @@ const UsersPage = () => {
                                         Edit
                                     </Button>
 
-                                    <Popconfirm
-                                        title="Delete this user?"
-                                        onConfirm={() =>
-                                            handleDelete(record.key)
-                                        }
-                                    >
 
-                                        <Button
-                                            size="small"
-                                            danger
-                                            type="text"
-                                        >
-                                            Delete
-                                        </Button>
-
-                                    </Popconfirm>
 
                                 </Space>
 

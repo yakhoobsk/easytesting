@@ -790,7 +790,7 @@ XML:
 
                                 if (status.includes("success")) color = "green";
                                 else if (status.includes("failed")) color = "red";
-                                else if (status.includes("pending")) color = "default";
+                                else if (status.includes("pending")) color = "yellow";
 
                                 return <Tag color={color}>{s || "Pending"}</Tag>;
                             },
