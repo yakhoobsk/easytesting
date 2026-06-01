@@ -559,97 +559,44 @@ const Dashboard = () => {
                         dataSource={
                             (
                                 executionDetails?.Results ||
-
                                 executionDetails?.results ||
-
                                 []
-                            ).map((e: any, i: number) => {
+                            )
+                                .slice(0, 5)
+                                .map((e: any, i: number) => {
+                                    const pass = Number(e.passed) || 0;
+                                    const fail = Number(e.failed) || 0;
+                                    const partialSuccess =
+                                        Number(e.partially_success) || 0;
+                                    const partialFailed =
+                                        Number(e.partially_failed) || 0;
 
-                                const pass =
-                                    Number(e.passed) || 0;
+                                    const total =
+                                        Number(e.total) ||
+                                        (pass + fail + partialSuccess + partialFailed);
 
-                                const fail =
-                                    Number(e.failed) || 0;
+                                    const percent =
+                                        e.match_percentage ||
+                                        (total > 0
+                                            ? Math.round((pass / total) * 100)
+                                            : 0);
 
-                                const partialSuccess =
-                                    Number(
-                                        e.partially_success
-                                    ) || 0;
+                                    const status =
+                                        e.testing_status ||
+                                        getExecutionStatus(pass, fail);
 
-                                const partialFailed =
-                                    Number(
-                                        e.partially_failed
-                                    ) || 0;
-
-                                const total =
-                                    Number(e.total)
-
-                                    ||
-
-                                    (
-                                        pass +
-                                        fail +
-                                        partialSuccess +
-                                        partialFailed
-                                    );
-
-                                const percent =
-                                    e.match_percentage ||
-
-                                    (
-                                        total > 0
-
-                                            ?
-
-                                            Math.round(
-                                                (
-                                                    pass /
-                                                    total
-                                                ) * 100
-                                            )
-
-                                            :
-
-                                            0
-                                    );
-
-                                const status =
-                                    e.testing_status
-
-                                    ||
-
-                                    getExecutionStatus(
+                                    return {
+                                        key: i,
+                                        env: e.environment_name || e.env || "-",
                                         pass,
-                                        fail
-                                    );
-
-                                return {
-
-                                    key: i,
-
-                                    env:
-                                        e.environment_name
-                                        ||
-                                        e.env
-                                        ||
-                                        "-",
-
-                                    pass,
-
-                                    fail,
-
-                                    partialSuccess,
-
-                                    partialFailed,
-
-                                    total,
-
-                                    percent,
-
-                                    status,
-                                };
-
-                            })
+                                        fail,
+                                        partialSuccess,
+                                        partialFailed,
+                                        total,
+                                        percent,
+                                        status,
+                                    };
+                                })
                         }
 
 

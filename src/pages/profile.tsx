@@ -22,8 +22,8 @@ const ProfilePage = () => {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [form] = Form.useForm();
 
-  const fetchProfile = () => {
-    const userEmail = auth?.user_email || (Array.isArray(auth) && auth[0]?.[0]?.user_email);
+  const fetchProfile = (email?: string) => {
+    const userEmail = email || auth?.user_email || (Array.isArray(auth) && auth[0]?.[0]?.user_email);
     if (userEmail) {
       setLoading(true);
       const payload = { User_Email: userEmail };
@@ -42,28 +42,36 @@ const ProfilePage = () => {
     fetchProfile();
   }, [dispatch, auth]);
 
-  const handleUpdate = (values: any) => {
-    setUpdateLoading(true);
-    const payload = {
-      First_Name: values.First_Name,
-      Last_Name: values.Last_Name,
-      User_Email: profileData?.User_Email,
-      Role: profileData?.Role
-    };
+  const handleUpdate = async (values: any) => {
+    try {
+      setUpdateLoading(true);
 
-    dispatch(UserProfileUpdate(payload)).then((res: any) => {
+      const payload = {
+        first_Name: values.first_Name,
+        last_Name: values.last_Name,
+        User_Email: values.User_Email,
+        Role: values.Role,
+        Profile_Image: ""
+      };
+
+      await dispatch(UserProfileUpdate(payload)).unwrap();
+
+      setIsModalOpen(false);
+      fetchProfile(values.User_Email);
+
+    } catch (error) {
+      console.error("Update failed:", error);
+    } finally {
       setUpdateLoading(false);
-      if (res.payload?.Response_Status === "Success") {
-        setIsModalOpen(false);
-        fetchProfile();
-      }
-    });
+    }
   };
 
   const openUpdateModal = () => {
     form.setFieldsValue({
       first_Name: profileData?.First_name,
       last_Name: profileData?.Last_name,
+      User_Email: profileData?.User_Email,
+      Role: profileData?.Role
     });
     setIsModalOpen(true);
   };
@@ -378,6 +386,37 @@ const ProfilePage = () => {
           <Form.Item
             name="last_Name"
             label="Last Name"
+            rules={[
+              {
+                required: true
+              }
+            ]}
+          >
+
+            <Input size="large" />
+
+          </Form.Item>
+
+
+          <Form.Item
+            name="User_Email"
+            label="Email"
+            rules={[
+              {
+                required: true,
+                type: "email"
+              }
+            ]}
+          >
+
+            <Input size="large" />
+
+          </Form.Item>
+
+
+          <Form.Item
+            name="Role"
+            label="Role"
             rules={[
               {
                 required: true
