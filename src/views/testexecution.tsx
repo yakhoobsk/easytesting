@@ -217,9 +217,12 @@ const TestExecution = () => {
             userMail:
                 auth?.user_email || "",
 
-            expectedPayload:
-                description || "",
+            expectedPayload: JSON.stringify(
+                JSON.parse(description)
+            ),
         };
+
+        console.log("Execution Payload:", payload);
         dispatch(ExecutionCreate(payload)).unwrap()
         const response = {
             User_Email: auth?.user_email || "",
