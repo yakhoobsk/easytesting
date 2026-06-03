@@ -20,6 +20,7 @@ import {
     MenuUnfoldOutlined,
     EditOutlined,
     FileSearchOutlined,
+    RobotOutlined,
     // FileSearchOutlined,
 } from "@ant-design/icons";
 
@@ -89,7 +90,7 @@ export default function MainLayout({ children }: Props): ReactElement {
         { key: "/", icon: <DashboardOutlined />, label: "Dashboard" },
         { key: "/test-execution", icon: <DeploymentUnitOutlined />, label: "Test Execution" },
         { key: "/payload-store", icon: <FileTextOutlined />, label: "Payload Store" },
-        // { key: "/ai-testcase", icon: <RobotOutlined />, label: "AI Test Cases" },
+        { key: "/ai-testcase", icon: <RobotOutlined />, label: "AI Test Cases" },
         { key: "/results-page", icon: <CheckCircleOutlined />, label: "Results" },
         // { key: "/tickets-page", icon: <ExclamationCircleOutlined />, label: "Tickets" },
         { key: "/audit-logs", icon: <FileSearchOutlined />, label: "Audit Logs" },
