@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { UserCreate, UserEdit, UserGet, UserMailGet } from "../../redux/services/settings/userService";
 import AppPagination from "../../components/AppPagination";
+import { EditOutlined } from "@ant-design/icons";
 
 
 const { Option } = Select;
@@ -33,6 +34,7 @@ const UsersPage = () => {
     const dispatch = useAppDispatch();
     const { auth } = useAppSelector((state) => state.auth);
     const { UserMail } = useAppSelector((state) => state.user);
+    console.log("UserMail data:", UserMail)
     const [filterField, setFilterField] = useState<string>("All");
     const [filterValue, setFilterValue] = useState("");
     const [open, setOpen] = useState(false);
@@ -42,9 +44,8 @@ const UsersPage = () => {
     const [pagination, setPagination] = useState({ page: 1, limit: 100 });
     const users = useAppSelector((state) => state.user?.userGet);
 
-    const fetchUserMails = () => {
-        dispatch(UserMailGet({}));
-    };
+
+
 
     useEffect(() => {
         const payload = {
@@ -56,9 +57,13 @@ const UsersPage = () => {
                 payload,
                 pagination: pagination,
             })
-        ),
-            fetchUserMails();
+        );
+
     }, [dispatch, filterField, filterValue]);
+
+    useEffect(() => {
+        dispatch(UserMailGet({}));
+    }, [dispatch]);
 
     const handleAdd = () => {
         const currentUserEmail =
@@ -313,10 +318,8 @@ const UsersPage = () => {
                             render: (_, record: User) => (
 
                                 <Space>
-
                                     <Button
-                                        size="small"
-                                        type="text"
+                                        icon={<EditOutlined />}
                                         onClick={() => {
                                             setSelectedUser(record);
 
@@ -332,10 +335,17 @@ const UsersPage = () => {
 
                                             setEditOpen(true);
                                         }}
+                                        style={{
+                                            background: "#f0f7ff",
+                                            border: "1px solid #d6e4ff",
+                                            color: "#1677ff",
+                                            borderRadius: 8,
+                                            fontWeight: 500,
+                                            boxShadow: "none",
+                                        }}
                                     >
                                         Edit
                                     </Button>
-
 
 
                                 </Space>
@@ -401,20 +411,31 @@ const FormUI = ({ form, setForm, userMails }: any) => (
         <Form.Item label="Email">
             <Select
                 showSearch
+                allowClear
+                placeholder="Select Email"
                 value={form.email}
+                optionFilterProp="label"
+                filterOption={(input, option) =>
+                    String(option?.label || "")
+                        .toLowerCase()
+                        .includes(input.toLowerCase())
+                }
                 onChange={(v) =>
                     setForm({
                         ...form,
                         email: v,
                     })
                 }
-                options={(userMails || []).map((item: any) => {
-                    const email = typeof item === "string" ? item : item.user_mail || item.user_email || item.email;
-                    return {
-                        label: email,
-                        value: email,
-                    };
-                })}
+                options={Array.from(
+                    new Set(
+                        (userMails || [])
+                            .map((item: any) => item?.user_mail)
+                            .filter(Boolean)
+                    )
+                ).map((email) => ({
+                    label: email,
+                    value: email,
+                }))}
             />
         </Form.Item>
 

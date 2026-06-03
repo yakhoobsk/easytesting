@@ -77,10 +77,11 @@ const MetricBox = ({ title, value, color, bg }: OverallResultsType) => (
 
 const Results: React.FC = () => {
     const dispatch = useAppDispatch();
-    const { resultData, overallResults, loading } = useAppSelector((state) => state.result);
+    const { resultData, loading } = useAppSelector((state) => state.result);
     const [open, setOpen] = useState(false);
     const [selectedRow, setSelectedRow] = useState<ResultType | null>(null);
-    const [pagination, setPagination] = useState({ page: 1, limit: 10 });
+    const [pagination, setPagination] = useState({ page: 1, limit: 5 });
+    const { overallResults } = useAppSelector((state) => state.result);
 
     useEffect(() => {
         dispatch(ResultFetch());
@@ -246,21 +247,8 @@ const Results: React.FC = () => {
                     ? "volcano"
                     : "warning";
 
-    const handlePagination = async (page: number, limit: number) => {
+    const handlePagination = (page: number, limit: number) => {
         setPagination({ page, limit });
-
-        try {
-            await dispatch(
-                OverallResultsFetch({
-
-                    pagination: { page, limit },
-                })
-            ).unwrap();
-        } catch (err) {
-            console.error("Pagination error:", err);
-        } finally {
-            console.warn("Pagination completed");
-        }
     };
 
     return (

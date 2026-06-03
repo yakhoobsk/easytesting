@@ -17,6 +17,7 @@ import { foldersGet, processGet } from "../redux/services/settings/branchService
 import { EnvironmentFetch } from "../redux/services/settings/environmentService";
 import { ComparisonCreate, ExecutionCreate, ExecutionDetailsFetch } from "../redux/services/settings/dashboardServices";
 import AppPagination from "../components/AppPagination";
+import { showSnackbar } from "../utils/snackbar";
 
 
 
@@ -55,14 +56,16 @@ const TestExecution = () => {
     const [selectedProcess, setSelectedProcess] = useState<string | null>(null);
     const [selectedEnvironment, setSelectedEnvironment] = useState<string | null>(null);
     const [description, setDescription] = useState("");
-    const [pagination, setPagination] = useState({ page: 1, limit: 10 });
+    const [pagination, setPagination] = useState({ page: 1, limit: 5 });
     const { auth } = useAppSelector((state) => state.auth);
-
+    const [searchText, setSearchText] = useState("");
+    const [filterField, setFilterField] = useState<any | "">("All");
+    const [filterValue, setFilterValue] = useState("");
     useEffect(() => {
         dispatch(foldersGet({ payload: {} }));
         dispatch(EnvironmentFetch());
-        dispatch(ExecutionDetailsFetch({ payload: { search_by_filter: "All", search: "" }, pagination }));
-    }, [dispatch]);
+        dispatch(ExecutionDetailsFetch({ payload: { search_by_filter: filterField, search: searchText }, pagination }));
+    }, [dispatch, searchText, filterField, pagination]);
 
     useEffect(() => {
         if (selectedFolder) {
@@ -86,9 +89,6 @@ const TestExecution = () => {
 
 
 
-    const [searchText, setSearchText] = useState("");
-    const [filterField, setFilterField] = useState<keyof TableRow | "">("");
-    const [filterValue, setFilterValue] = useState("");
 
 
     // --- envStats replaced by dynamic data ---
@@ -182,55 +182,103 @@ const TestExecution = () => {
     };
 
 
-    const handleExecuted = () => {
+    const handleExecuted = async () => {
+        // Required field validation
+        if (
+            !selectedFolder ||
+            !selectedProcess ||
+            !selectedEnvironment ||
+            !description?.trim()
+        ) {
+            showSnackbar(
+                "error",
+                "Folder, Process, Environment and Payload are required."
+            );
+            return;
+        }
+
+        // JSON/XML validation
+        try {
+            const trimmedPayload = description.trim();
+
+            if (trimmedPayload.startsWith("{") || trimmedPayload.startsWith("[")) {
+                JSON.parse(trimmedPayload);
+            } else if (trimmedPayload.startsWith("<")) {
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(
+                    trimmedPayload,
+                    "application/xml"
+                );
+
+                if (
+                    xmlDoc.getElementsByTagName("parsererror").length > 0
+                ) {
+                    throw new Error("Invalid XML");
+                }
+            } else {
+                throw new Error("Payload must be valid JSON or XML");
+            }
+        } catch (err) {
+            showSnackbar(
+                "error",
+                "Please enter a valid JSON or XML payload."
+            );
+            return;
+        }
 
         const selectedFolderName =
-            flatFolders.find(
-                (f) => f.id === selectedFolder
-            )?.name || "";
+            flatFolders.find((f) => f.id === selectedFolder)?.name || "";
 
         const selectedProcessName =
             processOptions.find(
-                (p: any) =>
-                    p.componentId === selectedProcess
+                (p: any) => p.componentId === selectedProcess
             )?.name || "";
 
         const selectedEnvironmentData =
             environments.find(
-                (env: any) =>
-                    env.id === selectedEnvironment
+                (env: any) => env.id === selectedEnvironment
             );
 
         const payload = {
             folder: selectedFolderName,
             process: selectedProcessName,
-
-            environment_name:
-                selectedEnvironmentData?.name || "",
-
-            environment_id:
-                selectedEnvironmentData?.id || "",
-
-            processId:
-                selectedProcess || "",
-
-            userMail:
-                auth?.user_email || "",
-
-            expectedPayload: JSON.stringify(
-                JSON.parse(description)
-            ),
+            environment_name: selectedEnvironmentData?.name || "",
+            environment_id: selectedEnvironmentData?.id || "",
+            processId: selectedProcess || "",
+            userMail: auth?.user_email || "",
+            expectedPayload: description,
         };
 
-        console.log("Execution Payload:", payload);
-        dispatch(ExecutionCreate(payload)).unwrap()
-        const response = {
-            User_Email: auth?.user_email || "",
-        }
-        dispatch(ComparisonCreate(response)).unwrap()
+        try {
+            await dispatch(ExecutionCreate(payload)).unwrap();
 
-        dispatch(ExecutionDetailsFetch({ payload: { search_by_filter: "All", search: "" }, pagination }))
-    }
+            await dispatch(
+                ComparisonCreate({
+                    User_Email: auth?.user_email || "",
+                })
+            ).unwrap();
+
+            dispatch(
+                ExecutionDetailsFetch({
+                    payload: {
+                        search_by_filter: "All",
+                        search: "",
+                    },
+                    pagination,
+                })
+            );
+
+            showSnackbar(
+                "success",
+                "Execution completed successfully."
+            );
+        } catch (error: any) {
+            showSnackbar(
+                "error",
+                error?.message || "Execution failed."
+            );
+        }
+    };
 
     return (
         <div style={{ padding: 30, background: "#ffffff" }}>
@@ -516,7 +564,6 @@ const TestExecution = () => {
 
                             </div>
 
-
                             <Input.TextArea
 
                                 value={
@@ -529,18 +576,23 @@ const TestExecution = () => {
                                     )
                                 }
 
-                                placeholder={`Paste JSON or XML
+                                placeholder={`Enter request payload in JSON or XML format
 
-JSON:
+JSON Example:
 {
- "name":"test"
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com"
 }
 
-XML:
+XML Example:
 <user>
- <name>test</name>
+  <firstName>John</firstName>
+  <lastName>Doe</lastName>
+  <email>john.doe@example.com</email>
 </user>
-`}
+
+Paste your payload here...`}
 
                                 autoSize={{
 
@@ -558,7 +610,7 @@ XML:
                                     fontSize: 13,
 
                                     background:
-                                        "#0f172a",
+                                        "#ffffff",
 
                                     color: "#e2e8f0",
 
@@ -703,7 +755,7 @@ XML:
                     <Col xs={24} sm={12} md={8}>
                         <Select
                             placeholder="Select field"
-                            value={filterField || undefined}
+                            value={filterField || "All"}
                             onChange={(val) => {
                                 setFilterField(val as keyof TableRow);
                                 setFilterValue("");
@@ -711,6 +763,7 @@ XML:
                             style={{ width: "100%" }}
                             allowClear
                         >
+                            <Select.Option value="All">All</Select.Option>
                             <Select.Option value="env">Environment</Select.Option>
                             <Select.Option value="total">Total</Select.Option>
                             <Select.Option value="success">Success</Select.Option>
@@ -813,3 +866,4 @@ XML:
 };
 
 export default TestExecution;
+

@@ -15,7 +15,6 @@ const ProfilePage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
   const { auth } = useAppSelector((state: any) => state.auth);
-
   const [profileData, setProfileData] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -96,8 +95,13 @@ const ProfilePage = () => {
   };
 
   return (
-    <Row justify="center" style={{ padding: 10, minHeight: "100vh" }}>
-      <Col xs={24} sm={24} md={24} lg={22} xl={20}>
+    <Row
+      justify="center"
+      style={{
+        padding: 20,
+        minHeight: "100vh",
+      }}
+    >      <Col span={24}>
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}

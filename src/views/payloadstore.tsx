@@ -14,7 +14,7 @@ const PayloadStore = () => {
     const [filterValue, setFilterValue] = useState("");
     const dispatch = useAppDispatch();
     const { executionDetails } = useAppSelector((state) => state.dashboard);
-    const [pagination, setPagination] = useState({ page: 1, limit: 10 });
+    const [pagination, setPagination] = useState({ page: 1, limit: 5 });
 
     useEffect(() => {
         dispatch(ExecutionDetailsFetch({ payload: { search_by_filter: "All", search: "" }, pagination }));

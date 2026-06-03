@@ -1,15 +1,24 @@
 import { Card, Tabs, Typography } from "antd";
+import { useSearchParams } from "react-router-dom";
+
 import UsersPage from "./UsersPage";
 import EnvironmentsPage from "./EnvironmentsPage";
 import ITSMConnectorsPage from "./ITSMConnectorsPage";
 import EmailNotificationsPage from "./EmailNotificationsPage";
 import StatusRange from "./percentagePage";
 
-
-const { TabPane } = Tabs;
 const { Text } = Typography;
 
 const Settingspage = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const activeTab =
+        searchParams.get("tab") || "users";
+
+    const handleTabChange = (key: string) => {
+        setSearchParams({ tab: key });
+    };
+
     return (
         <div
             style={{
@@ -21,7 +30,11 @@ const Settingspage = () => {
             <div style={{ marginBottom: 32 }}>
                 <Typography.Title
                     level={2}
-                    style={{ margin: 0, color: "#0f172a", fontWeight: 700 }}
+                    style={{
+                        margin: 0,
+                        color: "#0f172a",
+                        fontWeight: 700,
+                    }}
                 >
                     Settings
                 </Typography.Title>
@@ -39,30 +52,41 @@ const Settingspage = () => {
                 }}
             >
                 <Tabs
-                    defaultActiveKey="1"
+                    activeKey={activeTab}
+                    onChange={handleTabChange}
                     size="large"
-                    tabBarStyle={{
-                        marginBottom: 32,
-                        borderBottom: "1px solid #f1f5f9",
-                    }}
                 >
-                    <TabPane tab="Users" key="1">
+                    <Tabs.TabPane tab="Users" key="users">
                         <UsersPage />
-                    </TabPane>
-                    <TabPane tab="Status Configuration" key="2">
+                    </Tabs.TabPane>
+
+                    <Tabs.TabPane
+                        tab="Status Configuration"
+                        key="status"
+                    >
                         <StatusRange />
-                    </TabPane>
-                    <TabPane tab="Environments" key="3">
+                    </Tabs.TabPane>
+
+                    <Tabs.TabPane
+                        tab="Environments"
+                        key="environments"
+                    >
                         <EnvironmentsPage />
-                    </TabPane>
+                    </Tabs.TabPane>
 
-                    <TabPane tab="ITSM Connectors" key="4">
+                    <Tabs.TabPane
+                        tab="ITSM Connectors"
+                        key="itsm"
+                    >
                         <ITSMConnectorsPage />
-                    </TabPane>
+                    </Tabs.TabPane>
 
-                    <TabPane tab="Email Notifications" key="5">
+                    <Tabs.TabPane
+                        tab="Email Notifications"
+                        key="email"
+                    >
                         <EmailNotificationsPage />
-                    </TabPane>
+                    </Tabs.TabPane>
                 </Tabs>
             </Card>
         </div>
