@@ -20,6 +20,7 @@ import BoomiConfigSlice from './slices/settings/boomiConfigrationSlice'
 import environmentSlice from './slices/settings/environmentSlice'
 import resultSlice from './slices/settings/resultSlice'
 import StatusSlice from './slices/settings/statusconfigSlice'
+import AiTestCases from './slices/aitestcasesSlice'
 
 const storageEngine = (storage as any).default || storage;
 const authPersistConfig = {
@@ -48,7 +49,8 @@ export const store = configureStore({
     boomiConfig: BoomiConfigSlice.reducer,
     environment: environmentSlice.reducer,
     result: resultSlice.reducer,
-    status: StatusSlice.reducer
+    status: StatusSlice.reducer,
+    Ai : AiTestCases.reducer,
   },
 
   middleware: (getDefaultMiddleware) =>

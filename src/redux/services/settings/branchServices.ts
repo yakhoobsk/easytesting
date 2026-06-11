@@ -50,7 +50,6 @@ export const foldersGet = createAsyncThunk(
     ) => {
         try {
             const response = await boomiApi.post("/ws/rest/Easytesting/Folders/getdata", payload);
-
             return response.data;
         } catch (error: any) {
             return rejectWithValue(
