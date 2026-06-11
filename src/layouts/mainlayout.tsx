@@ -91,7 +91,7 @@ export default function MainLayout({ children }: Props): ReactElement {
         { key: "/test-execution", icon: <DeploymentUnitOutlined />, label: "Test Execution" },
         { key: "/payload-store", icon: <FileTextOutlined />, label: "Payload Store" },
         { key: "/ai-testcase", icon: <RobotOutlined />, label: "AI Test Cases" },
-        { key: "/results-page", icon: <CheckCircleOutlined />, label: "Results" },
+        { key: "/testcase-history", icon: <CheckCircleOutlined />, label: "Test Cases History" },
         // { key: "/tickets-page", icon: <ExclamationCircleOutlined />, label: "Tickets" },
         { key: "/audit-logs", icon: <FileSearchOutlined />, label: "Audit Logs" },
         { key: "/settings", icon: <SettingOutlined />, label: "Settings" },

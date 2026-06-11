@@ -34,7 +34,6 @@ const UsersPage = () => {
     const dispatch = useAppDispatch();
     const { auth } = useAppSelector((state) => state.auth);
     const { UserMail } = useAppSelector((state) => state.user);
-    console.log("UserMail data:", UserMail)
     const [filterField, setFilterField] = useState<string>("All");
     const [filterValue, setFilterValue] = useState("");
     const [open, setOpen] = useState(false);
