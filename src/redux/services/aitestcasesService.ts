@@ -1,5 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { boomiApi, urlGenarator } from "./commonAxios";
+import { boomiApi } from "./commonAxios";
 // import { showSnackbar } from "../../../utils/snackbar";
 import { showSnackbar } from "../../utils/snackbar";
 import axios from "axios";
