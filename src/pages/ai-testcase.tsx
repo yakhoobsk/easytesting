@@ -1,9 +1,9 @@
-import AITestCases from "../views/aitestcase";
+import Testcasepage from "../views/AitestcaseGenarator";
 
 const AitestcasePage = () => {
     return (
 
-        <AITestCases />
+        <Testcasepage />
     )
 };
 

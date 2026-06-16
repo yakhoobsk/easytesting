@@ -13,20 +13,11 @@ import {
 
 import { EditOutlined, DeleteOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import { useState, useEffect, useMemo } from "react";
-import { useAppDispatch, useAppSelector } from "../redux/hooks";
-import {
-    AiTescases,
-    AiTescasesGet,
-    ComponentDescriptionGet,
-    AiTestCasesCreate,
-    AiTestCasesUpdate,
-    AiTestCasesDelete
-} from "../redux/services/aitestcasesService";
-import {
-    foldersGet,
-    processGet
-} from "../redux/services/settings/branchServices";
-import { EnvironmentFetch } from "../redux/services/settings/environmentService";
+import { useAppDispatch, useAppSelector } from "../../redux/hooks";
+import { foldersGet, processGet } from "../../redux/services/settings/branchServices";
+import { EnvironmentFetch } from "../../redux/services/settings/environmentService";
+import { AiTescases, AiTescasesGet, AiTestCasesCreate, AiTestCasesDelete, AiTestCasesUpdate, ComponentDescriptionGet } from "../../redux/services/aitestcasesService";
+
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -76,6 +67,7 @@ const AITestCases = () => {
     useEffect(() => {
         dispatch(foldersGet({ payload: {} }));
         dispatch(EnvironmentFetch());
+
     }, [dispatch]);
 
     useEffect(() => {
@@ -318,8 +310,9 @@ const AITestCases = () => {
     const handleDelete = async (record: any) => {
         try {
             await dispatch(
-                AiTestCasesDelete({ test_case_gen_id: record.test_case_gen_id
- })
+                AiTestCasesDelete({
+                    test_case_gen_id: record.test_case_gen_id
+                })
             ).unwrap();
 
             setTableData((prev: any) =>
