@@ -8,7 +8,7 @@ export const AiTestCasesCreate = createAsyncThunk(
     "AiTestCases/create",
     async (payload: any, { rejectWithValue }) => {
         try {
-            const response = await boomiApi.post("/ws/rest/Easytesting/AiTestCases/create", payload);
+            const response = await boomiApi.post("/ws/rest/Easytesting/TestCase/Create", payload);
 
             if (response.data.Response_Status === "Failure") {
                 showSnackbar("error", response.data?.UI_Display_Message || "Email notification create failed");
@@ -29,8 +29,8 @@ export const AiTestCasesUpdate = createAsyncThunk(
     "AiTestCases/update",
     async (payload: any, { rejectWithValue }) => {
         try {
-            const response = await boomiApi.post(
-                "/ws/rest/Easytesting/AiTestCases/update",
+            const response = await boomiApi.put(
+                "/ws/rest/Easytesting/TestCase/TestCase_update",
                 payload
             );
 
@@ -61,8 +61,8 @@ export const AiTestCasesDelete = createAsyncThunk(
     "AiTestCases/delete",
     async (payload: any, { rejectWithValue }) => {
         try {
-            const response = await boomiApi.post(
-                "/ws/rest/Easytesting/AiTestCases/delete",
+            const response = await boomiApi.delete(
+                "/ws/rest/Easytesting/TestCase/Delete",
                 payload
             );
 
@@ -121,3 +121,21 @@ export const AiTescases = createAsyncThunk(
         }
     }
 );
+
+export const AiTescasesGet = createAsyncThunk(
+    "/AiTestCases/Get",
+    async (payload: any
+        , { rejectWithValue }) => {
+
+        try {
+            const response = await boomiApi.post("https://apibaseqa.easystepin.com/ws/rest/Easytesting/TestCase/get", payload);
+
+            return response.data;
+        } catch (error: any) {
+            return rejectWithValue(
+                error.response?.data?.message || "Fetch failed"
+            );
+        }
+    }
+);
+

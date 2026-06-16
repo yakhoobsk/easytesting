@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { ComponentDescriptionGet, AiTescases } from ".././services/aitestcasesService";
+import { ComponentDescriptionGet, AiTescases, AiTestCasesDelete } from ".././services/aitestcasesService";
 
 interface AuthState {
     loading: boolean;
@@ -51,6 +51,21 @@ const RollbackSlice = createSlice({
             })
 
             .addCase(AiTescases.rejected, (state, action: any) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+
+            .addCase(AiTestCasesDelete.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+
+            .addCase(AiTestCasesDelete.fulfilled, (state, action) => {
+                state.loading = false;
+                state.rollbackdetails = action.payload;
+            })
+
+            .addCase(AiTestCasesDelete.rejected, (state, action: any) => {
                 state.loading = false;
                 state.error = action.payload;
             });
