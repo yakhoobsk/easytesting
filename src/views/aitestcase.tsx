@@ -7,14 +7,16 @@ import {
     Select,
     Spin,
     Typography,
-    message,
+    App,
     Popconfirm
 } from "antd";
+
 import { EditOutlined, DeleteOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import { useState, useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../redux/hooks";
 import {
     AiTescases,
+    AiTescasesGet,
     ComponentDescriptionGet,
     AiTestCasesCreate,
     AiTestCasesUpdate,
@@ -42,6 +44,8 @@ const flattenFolders = (folders: any) => {
 };
 
 const AITestCases = () => {
+    const staticApp = App.useApp();
+    const messageApi = staticApp?.message;
     const dispatch = useAppDispatch();
 
     const { folderNames, processes, loading } =
@@ -65,6 +69,10 @@ const AITestCases = () => {
     const [btnLoading, setBtnLoading] = useState(false);
     const [prompt, setPrompt] = useState("");
 
+    // ─── NEW: track whether existing test cases were fetched ─────────
+    const [hasExistingTestCases, setHasExistingTestCases] = useState(false);
+    const [existingCheckLoading, setExistingCheckLoading] = useState(false);
+
     useEffect(() => {
         dispatch(foldersGet({ payload: {} }));
         dispatch(EnvironmentFetch());
@@ -76,6 +84,54 @@ const AITestCases = () => {
             dispatch(processGet({ payload: { "Folder id": selectedFolder } }));
         }
     }, [selectedFolder, dispatch]);
+
+    // ─── NEW: fetch existing test cases when folder, process & environment are selected ───
+    useEffect(() => {
+        const fetchExisting = async () => {
+            if (!selectedFolder || !selectedProcess || !selectedEnvironment) {
+                setHasExistingTestCases(false);
+                return;
+            }
+
+            setExistingCheckLoading(true);
+
+            try {
+                const res = await dispatch(
+                    AiTescasesGet({
+                        folder_id: selectedFolder,
+                        environment_id: selectedEnvironment,
+                        component_id: selectedProcess
+                    })
+                ).unwrap();
+
+                const results = res?.[0]?.Results || res?.Results || [];
+                if (Array.isArray(results) && results.length > 0) {
+                    const formatted = results.map((item: any, index: number) => ({
+                        key: item.id ?? index,
+                        id: item.test_case_id,
+                        description: item.description,
+                        expectedResult: item.expected_result,
+                        steps: item.steps_to_execute,
+                        isManual: false,
+                        test_case_gen_id: item.test_case_gen_id
+                    }));
+
+                    setTableData(formatted);
+                    setProcessName(results[0]?.process_name || "Generated Test Cases");
+                    setHasExistingTestCases(true);
+                } else {
+                    setHasExistingTestCases(false);
+                }
+            } catch (err) {
+                console.error(err);
+                setHasExistingTestCases(false);
+            } finally {
+                setExistingCheckLoading(false);
+            }
+        };
+
+        fetchExisting();
+    }, [selectedFolder, selectedProcess, selectedEnvironment, dispatch]);
 
     const flatFolders = useMemo(() => {
         const raw = Array.isArray(folderNames) ? folderNames[0] : folderNames;
@@ -119,6 +175,7 @@ const AITestCases = () => {
                 description: item.description,
                 expectedResult: item.expectedResult,
                 steps: (item.steps || []).join(", "),
+                test_case_gen_id: item.test_case_gen_id,
                 isManual: false
             }));
 
@@ -139,7 +196,7 @@ const AITestCases = () => {
         );
 
         if (hasEmpty) {
-            message.warning("Please fill existing manual test case first");
+            messageApi?.warning("Please fill existing manual test case first");
             return;
         }
 
@@ -149,6 +206,7 @@ const AITestCases = () => {
             description: "",
             expectedResult: "",
             steps: "",
+            test_case_gen_id: "",
             isManual: true
         };
 
@@ -164,7 +222,7 @@ const AITestCases = () => {
 
     const handleSave = async () => {
         if (!selectedEnvironment) {
-            message.error("Select Environment");
+            messageApi?.error("Select Environment");
             return;
         }
 
@@ -181,29 +239,37 @@ const AITestCases = () => {
             (p: any) => p.componentId === selectedProcess
         );
 
-        const selectedRows = tableData.filter((row: any) =>
-            selectedRowKeys.includes(row.key)
-        );
+        const selectedRows = selectedRowKeys.length > 0
+            ? tableData.filter((row: any) =>
+                selectedRowKeys.includes(row.key)
+            )
+            : tableData;
+
+        if (!selectedRows.length) {
+            messageApi?.warning("No test cases available to save");
+            return;
+        }
 
         const payload = selectedRows.map((row: any) => ({
-            Enviornment_Id: selectedEnv?.environment_id || selectedEnv?.id || "",
-            Enviornment_Name: selectedEnv?.name || "",
+            Environment_Id: selectedEnv?.environment_id || selectedEnv?.id || "",
+            Environment_Name: selectedEnv?.name || "",
             Folder_Id: selectedFolderObj?.id || "",
             Folder_Name: selectedFolderObj?.name || "",
             Process_Name: selectedProcessObj?.name || "",
             Component_Id: selectedProcessObj?.componentId,
-            Description: componentDescription?.prompt || row.description,
+            Description: row.description,
             Is_Ai_Generated: !row.isManual,
             Test_Case_Id: row.id,
             Expected_Result: row.expectedResult,
             Steps_To_Execute: row.steps
-        }));
 
+        }));
         try {
             await dispatch(AiTestCasesCreate(payload)).unwrap();
-            message.success("Saved successfully");
+            messageApi?.success("Saved successfully");
         } catch (err) {
             console.error(err);
+            messageApi?.error("Failed to save test cases");
         }
     };
 
@@ -220,13 +286,14 @@ const AITestCases = () => {
 
     const handleEditSave = async (record: any) => {
         if (!editingRow.id || !editingRow.description || !editingRow.expectedResult || !editingRow.steps) {
-            message.warning("Please fill all fields before saving");
+            messageApi?.warning("Please fill all fields before saving");
             return;
         }
 
         try {
             await dispatch(
                 AiTestCasesUpdate({
+                    test_case_gen_id: editingRow.test_case_gen_id,
                     Test_Case_Id: editingRow.id,
                     Description: editingRow.description,
                     Expected_Result: editingRow.expectedResult,
@@ -240,10 +307,10 @@ const AITestCases = () => {
             setTableData(updated);
             setEditingKey(null);
             setEditingRow(null);
-            message.success("Test case updated successfully");
+            messageApi?.success("Test case updated successfully");
         } catch (err) {
             console.error(err);
-            message.error("Failed to update test case");
+            messageApi?.error("Failed to update test case");
         }
     };
 
@@ -251,19 +318,20 @@ const AITestCases = () => {
     const handleDelete = async (record: any) => {
         try {
             await dispatch(
-                AiTestCasesDelete({ Test_Case_Id: record.id })
+                AiTestCasesDelete({ test_case_gen_id: record.test_case_gen_id
+ })
             ).unwrap();
 
             setTableData((prev: any) =>
-                prev.filter((row: any) => row.key !== record.key)
+                prev.filter((row: any) => row.test_case_gen_id !== record.test_case_gen_id)
             );
             setSelectedRowKeys((prev) =>
-                prev.filter((k) => k !== record.key)
+                prev.filter((k) => k !== record.test_case_gen_id)
             );
-            message.success("Test case deleted successfully");
+            messageApi?.success("Test case deleted successfully");
         } catch (err) {
             console.error(err);
-            message.error("Failed to delete test case");
+            messageApi?.error("Failed to delete test case");
         }
     };
 
@@ -490,18 +558,22 @@ const AITestCases = () => {
                             justifyContent: "space-between"
                         }}
                     >
-<div style={{ maxWidth: "90%" }}>
-    <strong>Description:</strong>
-    <Typography.Text
-        copyable={{
-            text: componentDescription.prompt,
-            onCopy: () => message.success("Copied!")
-        }}
-        style={{ display: "block", margin: 0 }}
-    >
-        {componentDescription.prompt}
-    </Typography.Text>
-</div>
+                        <div style={{ maxWidth: "90%" }}>
+                            <strong>Description:</strong>
+                            <Typography.Text
+                                copyable={{
+                                    text: componentDescription.prompt,
+                                    onCopy: () => {
+                                        if (messageApi?.success) {
+                                            messageApi.success("Copied!");
+                                        }
+                                    }
+                                }}
+                                style={{ display: "block", margin: 0 }}
+                            >
+                                {componentDescription.prompt}
+                            </Typography.Text>
+                        </div>
                     </div>
                 )}
 
@@ -515,9 +587,9 @@ const AITestCases = () => {
                 <Space style={{ marginTop: 10 }}>
                     <Button
                         type="primary"
-                        loading={btnLoading}
+                        loading={btnLoading || existingCheckLoading}
                         onClick={handleGenerate}
-                        disabled={!selectedProcess}
+                        disabled={!selectedProcess || hasExistingTestCases}
                     >
                         Generate Test Cases
                     </Button>
@@ -534,7 +606,7 @@ const AITestCases = () => {
                     )
                 }
             >
-                {loading ? (
+                {loading || existingCheckLoading ? (
                     <Spin />
                 ) : (
                     <>
