@@ -89,7 +89,7 @@ const TestCaseTable: React.FC = () => {
             key: "actions",
             fixed: "right",
             width: 160,
-            render: (_, record) => (
+            render: (_) => (
                 <Space>
                     <Button
                         icon={<EyeOutlined />}
