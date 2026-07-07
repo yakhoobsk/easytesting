@@ -16,7 +16,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { foldersGet, processGet } from "../../redux/services/settings/branchServices";
 import { EnvironmentFetch } from "../../redux/services/settings/environmentService";
-import { AiTescases, AiTescasesGet, AiTestCasesCreate, AiTestCasesDelete, AiTestCasesUpdate, ComponentDescriptionGet } from "../../redux/services/aitestcasesService";
+import { AiTescases, TescasesGet, AiTestCasesCreate, AiTestCasesDelete, AiTestCasesUpdate, ComponentDescriptionGet } from "../../redux/services/aitestcasesService";
 
 
 const { TextArea } = Input;
@@ -89,7 +89,7 @@ const AITestCases = () => {
 
             try {
                 const res = await dispatch(
-                    AiTescasesGet({
+                    TescasesGet({
                         folder_id: selectedFolder,
                         environment_id: selectedEnvironment,
                         component_id: selectedProcess

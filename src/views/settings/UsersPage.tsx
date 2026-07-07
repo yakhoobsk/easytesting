@@ -10,7 +10,6 @@ import {
     Space,
     Switch,
     Table,
-    Tag,
 } from "antd";
 
 import { useEffect, useState } from "react";
@@ -155,10 +154,10 @@ const UsersPage = () => {
 
     return (
         <>
-            <Space direction="vertical" style={{ width: "100%" }} size="large">
+            <Space direction="vertical" style={{ width: "100%" }} size="small">
 
                 {/* Filters */}
-                <Row gutter={[12, 12]} align="middle">
+                <Row gutter={[8, 8]} align="middle">
 
                     <Col xs={24} sm={12} md={6}>
                         <Select
@@ -197,29 +196,26 @@ const UsersPage = () => {
                         }}
                     >
 
-                        <Button
-                            block
-                            type="primary"
-
-                            onClick={() => {
-                                setForm({
-                                    status: "Active"
-                                });
-
-                                setOpen(true);
-                            }}
-
-                            style={{
-                                borderRadius: 8,
-                                height: 40,
-                                fontWeight: 600,
-                                background: "#2563eb"
-                            }}
-                        >
-
-                            + Add User
-
-                        </Button>
+                        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                            <Button
+                                type="primary"
+                                onClick={() => {
+                                    setForm({
+                                        status: "Active"
+                                    });
+                                    setOpen(true);
+                                }}
+                                style={{
+                                    borderRadius: 6,
+                                    height: 32,
+                                    fontWeight: 500,
+                                    background: "#2563eb",
+                                    padding: "0 14px",
+                                }}
+                            >
+                                + Add User
+                            </Button>
+                        </div>
 
                     </Col>
 
@@ -290,23 +286,70 @@ const UsersPage = () => {
                             title: "Role",
                             dataIndex: "role",
                             width: 120,
-
-                            render: (r: string) => (
-                                <Tag color={r === "Admin" ? "blue" : "blue"}>
-                                    {r}
-                                </Tag>
-                            )
+                            render: (role: string) => (
+                                <div style={{ display: "flex", alignItems: "center" }}>
+                                    <span
+                                        style={{
+                                            padding: "4px 12px",
+                                            borderRadius: 20,
+                                            fontSize: 12,
+                                            fontWeight: 500,
+                                            border: "1px solid #d1d5db",
+                                            background: "#f9fafb",
+                                            color: "#374151",
+                                        }}
+                                    >
+                                        {role}
+                                    </span>
+                                </div>
+                            ),
                         },
 
                         {
                             title: "Status",
                             dataIndex: "is_status",
                             width: 120,
-                            render: (status: number) => (
-                                <Tag color={status === 1 ? "green" : "red"}>
-                                    {status === 1 ? "Active" : "Inactive"}
-                                </Tag>
-                            )
+                            render: (status: number) => {
+                                const isActive = status === 1;
+                                const isDeleted = status === 2; // if you have deleted state
+
+                                return (
+                                    <div style={{ display: "flex", alignItems: "center" }}>
+                                        <span
+                                            style={{
+                                                padding: "4px 12px",
+                                                borderRadius: 20,
+                                                fontSize: 12,
+                                                fontWeight: 500,
+                                                border: `1px solid ${isDeleted
+                                                    ? "#fca5a5"
+                                                    : isActive
+                                                        ? "#86efac"
+                                                        : "#fca5a5"
+                                                    }`,
+                                                background: `${isDeleted
+                                                    ? "#fee2e2"
+                                                    : isActive
+                                                        ? "#ecfdf5"
+                                                        : "#fff1f2"
+                                                    }`,
+                                                color: `${isDeleted
+                                                    ? "#dc2626"
+                                                    : isActive
+                                                        ? "#059669"
+                                                        : "#dc2626"
+                                                    }`,
+                                            }}
+                                        >
+                                            {isDeleted
+                                                ? "Deleted"
+                                                : isActive
+                                                    ? "Active"
+                                                    : "Inactive"}
+                                        </span>
+                                    </div>
+                                );
+                            },
                         },
 
                         {
