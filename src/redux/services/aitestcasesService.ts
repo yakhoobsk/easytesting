@@ -122,18 +122,86 @@ export const AiTescases = createAsyncThunk(
     }
 );
 
-export const AiTescasesGet = createAsyncThunk(
-    "/AiTestCases/Get",
+export const TescasesGet = createAsyncThunk(
+    "/TestCases/Get",
     async (payload: any
         , { rejectWithValue }) => {
 
         try {
-            const response = await boomiApi.post("https://apibaseqa.easystepin.com/ws/rest/Easytesting/TestCase/get", payload);
+            const response = await boomiApi.post("/ws/rest/Easytesting/TestCase/get", payload);
 
             return response.data;
         } catch (error: any) {
             return rejectWithValue(
                 error.response?.data?.message || "Fetch failed"
+            );
+        }
+    }
+);
+
+export const TestCasesUpdate = createAsyncThunk(
+    "TestCases/update",
+    async (payload: any, { rejectWithValue }) => {
+        try {
+            const response = await boomiApi.put(
+                "/ws/rest/Easytesting/TestCase/Update",
+                payload
+            );
+
+            const resData = Array.isArray(response.data) ? response.data[0] : response.data;
+
+            if (resData?.Response_Status === "Failure") {
+                showSnackbar(
+                    "error",
+                    resData?.UI_Display_Message || "Test case update failed"
+                );
+                return rejectWithValue(resData);
+            } else {
+                showSnackbar(
+                    "success",
+                    resData?.UI_Display_Message || "Test Cases updated successfully"
+                );
+            }
+
+            return response.data;
+        } catch (error: any) {
+            showSnackbar("error", "Test case update failed");
+            return rejectWithValue(
+                error.response?.data?.message || "Test case update failed"
+            );
+        }
+    }
+);
+
+export const TestCasesDelete = createAsyncThunk(
+    "TestCases/delete",
+    async (payload: any, { rejectWithValue }) => {
+        try {
+            const response = await boomiApi.delete(
+                "/ws/rest/Easytesting/TestCase/Delete",
+                { data: payload }
+            );
+
+            const resData = Array.isArray(response.data) ? response.data[0] : response.data;
+
+            if (resData?.Response_Status === "Failure") {
+                showSnackbar(
+                    "error",
+                    resData?.UI_Display_Message || "Test case delete failed"
+                );
+                return rejectWithValue(resData);
+            } else {
+                showSnackbar(
+                    "success",
+                    resData?.UI_Display_Message || "Test case deleted successfully"
+                );
+            }
+
+            return response.data;
+        } catch (error: any) {
+            showSnackbar("error", "Test case delete failed");
+            return rejectWithValue(
+                error.response?.data?.message || "Test case delete failed"
             );
         }
     }
