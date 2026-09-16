@@ -6,7 +6,6 @@ import {
     Button,
     Table,
     Tag,
-    Progress,
     Input,
 
     Typography,
@@ -18,9 +17,6 @@ import { EnvironmentFetch } from "../redux/services/settings/environmentService"
 import { ComparisonCreate, ExecutionCreate, ExecutionDetailsFetch } from "../redux/services/settings/dashboardServices";
 import AppPagination from "../components/AppPagination";
 import { showSnackbar } from "../utils/snackbar";
-
-
-
 
 const { Option } = Select;
 
@@ -130,9 +126,6 @@ const TestExecution = () => {
         };
     });
 
-    const totalPass = tableData.reduce((a, b) => a + b.pass, 0);
-    const totalFail = tableData.reduce((a, b) => a + b.fail, 0);
-    const overallStatus = getExecutionStatus(totalPass, totalFail);
 
     const filteredData = useMemo(() => {
         let temp = tableData;
@@ -238,6 +231,7 @@ const TestExecution = () => {
             environments.find(
                 (env: any) => env.id === selectedEnvironment
             );
+        const finalPayload = JSON.stringify(JSON.parse(description.trim()));
 
         const payload = {
             folder: selectedFolderName,
@@ -246,8 +240,11 @@ const TestExecution = () => {
             environment_id: selectedEnvironmentData?.id || "",
             processId: selectedProcess || "",
             userMail: auth?.user_email || "",
-            expectedPayload: description,
+            expectedPayload: finalPayload,
         };
+
+
+        console.log("Execution Payload:", payload);
 
         try {
             await dispatch(ExecutionCreate(payload)).unwrap();
@@ -565,17 +562,8 @@ const TestExecution = () => {
                             </div>
 
                             <Input.TextArea
-
-                                value={
-                                    description
-                                }
-
-                                onChange={(e) =>
-                                    setDescription(
-                                        e.target.value
-                                    )
-                                }
-
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
                                 placeholder={`Enter request payload in JSON or XML format
 
 JSON Example:
@@ -593,38 +581,20 @@ XML Example:
 </user>
 
 Paste your payload here...`}
-
                                 autoSize={{
-
                                     minRows: 8,
-
-                                    maxRows: 14
-
+                                    maxRows: 14,
                                 }}
-
                                 style={{
-
-                                    fontFamily:
-                                        "monospace",
-
+                                    fontFamily: "monospace",
                                     fontSize: 13,
-
-                                    background:
-                                        "#ffffff",
-
-                                    color: "#e2e8f0",
-
-                                    border:
-                                        "none",
-
+                                    background: "#ffffff",
+                                    color: "#172033",       // 👈 entered payload color
+                                    border: "1px solid #d9e2ef",
                                     borderRadius: 10,
-
-                                    padding: 14
-
+                                    padding: 14,
                                 }}
-
                             />
-
 
                             <div
                                 style={{
@@ -722,29 +692,6 @@ Paste your payload here...`}
                 </Row>
 
             </Card>
-
-            <Card
-                title={
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                        <span>Execution Progress</span>
-                        <Tag
-                            color={
-                                overallStatus === "Success"
-                                    ? "green"
-                                    : overallStatus === "Failed"
-                                        ? "red"
-                                        : "orange"
-                            }
-                        >
-                            {overallStatus}
-                        </Tag>
-                    </div>
-                }
-                style={{ marginBottom: 12 }}
-            >
-                <Progress percent={70} status="active" />
-            </Card>
-
 
 
             <Card
