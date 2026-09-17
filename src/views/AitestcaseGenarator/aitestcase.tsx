@@ -8,15 +8,15 @@ import {
     Spin,
     Typography,
     App,
-    Popconfirm
+
 } from "antd";
 
-import { EditOutlined, DeleteOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
+import { EditOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import { useState, useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { foldersGet, processGet } from "../../redux/services/settings/branchServices";
 import { EnvironmentFetch } from "../../redux/services/settings/environmentService";
-import { AiTescases, TescasesGet, AiTestCasesCreate, AiTestCasesDelete, AiTestCasesUpdate, ComponentDescriptionGet } from "../../redux/services/aitestcasesService";
+import { AiTescases, TescasesGet, AiTestCasesCreate, AiTestCasesUpdate, ComponentDescriptionGet } from "../../redux/services/aitestcasesService";
 
 
 const { TextArea } = Input;
@@ -60,8 +60,6 @@ const AITestCases = () => {
     const [btnLoading, setBtnLoading] = useState(false);
     const [prompt, setPrompt] = useState("");
 
-    // ─── NEW: track whether existing test cases were fetched ─────────
-    const [hasExistingTestCases, setHasExistingTestCases] = useState(false);
     const [existingCheckLoading, setExistingCheckLoading] = useState(false);
 
     useEffect(() => {
@@ -81,7 +79,6 @@ const AITestCases = () => {
     useEffect(() => {
         const fetchExisting = async () => {
             if (!selectedFolder || !selectedProcess || !selectedEnvironment) {
-                setHasExistingTestCases(false);
                 return;
             }
 
@@ -110,13 +107,9 @@ const AITestCases = () => {
 
                     setTableData(formatted);
                     setProcessName(results[0]?.process_name || "Generated Test Cases");
-                    setHasExistingTestCases(true);
-                } else {
-                    setHasExistingTestCases(false);
                 }
             } catch (err) {
                 console.error(err);
-                setHasExistingTestCases(false);
             } finally {
                 setExistingCheckLoading(false);
             }
@@ -143,7 +136,7 @@ const AITestCases = () => {
     };
 
     const handleGenerate = async () => {
-        if (!selectedProcess) return;
+        if (!selectedProcess || !prompt.trim()) return;
 
         setBtnLoading(true);
 
@@ -151,7 +144,7 @@ const AITestCases = () => {
             const res = await dispatch(
                 AiTescases({
                     process_id: selectedProcess,
-                    prompt: prompt || "Generate test cases"
+                    prompt
                 })
             ).unwrap();
 
@@ -306,27 +299,7 @@ const AITestCases = () => {
         }
     };
 
-    // ─── Delete handler ──────────────────────────────────────────────
-    const handleDelete = async (record: any) => {
-        try {
-            await dispatch(
-                AiTestCasesDelete({
-                    test_case_gen_id: record.test_case_gen_id
-                })
-            ).unwrap();
 
-            setTableData((prev: any) =>
-                prev.filter((row: any) => row.test_case_gen_id !== record.test_case_gen_id)
-            );
-            setSelectedRowKeys((prev) =>
-                prev.filter((k) => k !== record.test_case_gen_id)
-            );
-            messageApi?.success("Test case deleted successfully");
-        } catch (err) {
-            console.error(err);
-            messageApi?.error("Failed to delete test case");
-        }
-    };
 
     const columns = [
         {
@@ -459,23 +432,7 @@ const AITestCases = () => {
                             style={{ padding: 0 }}
                             title="Edit"
                         />
-                        <Popconfirm
-                            title="Delete this test case?"
-                            description="This action cannot be undone."
-                            onConfirm={() => handleDelete(record)}
-                            okText="Yes"
-                            cancelText="No"
-                            okButtonProps={{ danger: true }}
-                        >
-                            <Button
-                                type="link"
-                                icon={<DeleteOutlined />}
-                                danger
-                                disabled={!!editingKey}
-                                style={{ padding: 0 }}
-                                title="Delete"
-                            />
-                        </Popconfirm>
+
                     </Space>
                 );
             }
@@ -572,7 +529,7 @@ const AITestCases = () => {
 
                 <TextArea
                     rows={4}
-                    placeholder="Enter prompt (optional)"
+                    placeholder="Enter prompt"
                     value={prompt}
                     onChange={(e) => setPrompt(e.target.value)}
                 />
@@ -582,7 +539,7 @@ const AITestCases = () => {
                         type="primary"
                         loading={btnLoading || existingCheckLoading}
                         onClick={handleGenerate}
-                        disabled={!selectedProcess || hasExistingTestCases}
+                        disabled={!selectedProcess || !prompt.trim()}
                     >
                         Generate Test Cases
                     </Button>
