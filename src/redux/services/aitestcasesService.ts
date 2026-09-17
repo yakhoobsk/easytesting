@@ -1,9 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { boomiApi } from "./commonAxios";
+import { boomiApi, aiTestCaseApi } from "./commonAxios";
 // import { showSnackbar } from "../../../utils/snackbar";
 import { showSnackbar } from "../../utils/snackbar";
-import config from "./config";
-import axios from "axios";
 
 export const AiTestCasesCreate = createAsyncThunk(
     "AiTestCases/create",
@@ -113,7 +111,7 @@ export const AiTescases = createAsyncThunk(
         , { rejectWithValue }) => {
 
         try {
-            const response = await axios.post(`${config.AI_TESTCASE_BASEURL}/api/test-cases/generate`, payload);
+            const response = await aiTestCaseApi.post("/api/test-cases/generate", payload);
             return response.data;
         } catch (error: any) {
             return rejectWithValue(

@@ -12,6 +12,11 @@ const boomiApi = axios.create({
     timeout: 20000,
 });
 
+const aiTestCaseApi = axios.create({
+    baseURL: config.AI_TESTCASE_BASEURL,
+    headers: config.headersCommon,
+});
+
 boomiApi.interceptors.request.use(
     async (configuration: any) => {
         try {
@@ -57,4 +62,4 @@ const decryptedToken = () => {
     return null;
 };
 
-export { boomiApi, urlGenarator, decryptedToken, }
+export { boomiApi, aiTestCaseApi, urlGenarator, decryptedToken, }
