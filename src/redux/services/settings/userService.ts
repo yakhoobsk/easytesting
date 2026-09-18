@@ -41,6 +41,7 @@ export const UserCreate = createAsyncThunk("user/create", async ({ payload }: Us
 
     return response.data;
   } catch (error: any) {
+    showSnackbar("error", "User creation failed");
     return rejectWithValue(error.response?.data?.message || "User creation failed");
   }
 }
@@ -60,6 +61,7 @@ export const UserEdit = createAsyncThunk("user/edit", async (payload: any, { rej
 
     return response.data;
   } catch (error: any) {
+    showSnackbar("error", "User update failed");
     return rejectWithValue(error.response?.data?.message || "Login failed");
   }
 }

@@ -319,7 +319,6 @@ const ExecutionDashboard = () => {
                     <Progress
                         percent={value}
                         strokeWidth={12}
-                        showInfo={false}
                         style={{ width: 140 }}
                         strokeColor={
                             value >= 90

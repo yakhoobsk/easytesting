@@ -115,14 +115,15 @@ export const validationGet = createAsyncThunk("get/create", async ({ payload }: 
         const response = await boomiApi.post("/ws/rest/EasyCICD/esiticket/create", payload);
 
         if (response.data.Response_Status === "Failure") {
-            showSnackbar("error", response.data?.UI_Display_Message || "Login failed");
+            showSnackbar("error", response.data?.UI_Display_Message || "Ticket creation failed");
         } else if (response.data.Response_Status === "Success") {
-            showSnackbar("success", response.data?.UI_Display_Message || "Login successful");
+            showSnackbar("success", response.data?.UI_Display_Message || "Ticket created successfully");
 
         }
         return response.data;
     } catch (error: any) {
-        return rejectWithValue(error.response?.data?.message || "Login failed");
+        showSnackbar("error", error?.response?.data?.message || "Ticket creation failed");
+        return rejectWithValue(error.response?.data?.message || "Ticket creation failed");
     }
 }
 );

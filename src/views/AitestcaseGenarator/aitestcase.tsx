@@ -8,6 +8,8 @@ import {
     Spin,
     Typography,
     App,
+    Row,
+    Col,
 
 } from "antd";
 
@@ -275,59 +277,65 @@ const AITestCases = () => {
     return (
         <div style={{ padding: 16, background: "#f5f7fb" }}>
             <Card title="AI Test Case Generator" style={{ marginBottom: 12 }}>
-                <div style={{ display: "flex", gap: "2%", marginBottom: 12 }}>
-                    <Select
-                        placeholder="Select Folder"
-                        style={{ width: "32%" }}
-                        value={selectedFolder}
-                        onChange={setSelectedFolder}
-                        showSearch
-                        optionFilterProp="children"
-                        allowClear
-                    >
-                        {flatFolders.map((folder: any) => (
-                            <Option key={folder.id} value={folder.id}>
-                                {folder.name}
-                            </Option>
-                        ))}
-                    </Select>
+                <Row gutter={[12, 12]} style={{ marginBottom: 12 }}>
+                    <Col xs={24} sm={12} md={8}>
+                        <Select
+                            placeholder="Select Folder"
+                            style={{ width: "100%" }}
+                            value={selectedFolder}
+                            onChange={setSelectedFolder}
+                            showSearch
+                            optionFilterProp="children"
+                            allowClear
+                        >
+                            {flatFolders.map((folder: any) => (
+                                <Option key={folder.id} value={folder.id}>
+                                    {folder.name}
+                                </Option>
+                            ))}
+                        </Select>
+                    </Col>
 
-                    <Select
-                        placeholder="Select Process"
-                        style={{ width: "32%" }}
-                        value={selectedProcess}
-                        onChange={handleProcessChange}
-                        disabled={!selectedFolder}
-                        showSearch
-                        optionFilterProp="children"
-                        allowClear
-                    >
-                        {processOptions.map((proc: any) => (
-                            <Option key={proc.componentId} value={proc.componentId}>
-                                {proc.name}
-                            </Option>
-                        ))}
-                    </Select>
+                    <Col xs={24} sm={12} md={8}>
+                        <Select
+                            placeholder="Select Process"
+                            style={{ width: "100%" }}
+                            value={selectedProcess}
+                            onChange={handleProcessChange}
+                            disabled={!selectedFolder}
+                            showSearch
+                            optionFilterProp="children"
+                            allowClear
+                        >
+                            {processOptions.map((proc: any) => (
+                                <Option key={proc.componentId} value={proc.componentId}>
+                                    {proc.name}
+                                </Option>
+                            ))}
+                        </Select>
+                    </Col>
 
-                    <Select
-                        placeholder="Select Environment"
-                        style={{ width: "32%" }}
-                        value={selectedEnvironment}
-                        onChange={setSelectedEnvironment}
-                        showSearch
-                        optionFilterProp="children"
-                        allowClear
-                    >
-                        {environments?.map((env: any) => (
-                            <Option
-                                key={env.environment_id || env.id}
-                                value={env.environment_id || env.id}
-                            >
-                                {env.name}
-                            </Option>
-                        ))}
-                    </Select>
-                </div>
+                    <Col xs={24} sm={12} md={8}>
+                        <Select
+                            placeholder="Select Environment"
+                            style={{ width: "100%" }}
+                            value={selectedEnvironment}
+                            onChange={setSelectedEnvironment}
+                            showSearch
+                            optionFilterProp="children"
+                            allowClear
+                        >
+                            {environments?.map((env: any) => (
+                                <Option
+                                    key={env.environment_id || env.id}
+                                    value={env.environment_id || env.id}
+                                >
+                                    {env.name}
+                                </Option>
+                            ))}
+                        </Select>
+                    </Col>
+                </Row>
 
                 {componentDescription?.prompt && (
                     <div
@@ -401,6 +409,7 @@ const AITestCases = () => {
                             dataSource={tableData}
                             columns={columns}
                             pagination={false}
+                            scroll={{ x: "max-content" }}
                         />
 
                         {tableData.length > 0 && (

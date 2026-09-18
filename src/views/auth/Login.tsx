@@ -186,7 +186,7 @@ const LoginView = () => {
                 marginTop: 40,
               }}
             >
-              <Col span={8}>
+              <Col xs={24} sm={12} md={8}>
                 <motion.div
                   whileHover={{
                     y: -8,
@@ -225,7 +225,7 @@ const LoginView = () => {
                 </motion.div>
               </Col>
 
-              <Col span={8}>
+              <Col xs={24} sm={12} md={8}>
                 <motion.div
                   whileHover={{
                     y: -8,
@@ -264,7 +264,7 @@ const LoginView = () => {
                 </motion.div>
               </Col>
 
-              <Col span={8}>
+              <Col xs={24} sm={12} md={8}>
                 <motion.div
                   whileHover={{
                     y: -8,

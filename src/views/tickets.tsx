@@ -12,6 +12,7 @@ import {
   Col,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import { showSnackbar } from "../utils/snackbar";
 
 interface Ticket {
   key: number;
@@ -75,9 +76,15 @@ const Tickets: React.FC = () => {
 
   // ✅ ADD
   const handleAdd = () => {
+    if (!form.title) {
+      showSnackbar("error", "Please enter a title");
+      return;
+    }
+
     setTickets([...tickets, { key: Date.now(), ...form }]);
     setOpen(false);
     setForm({});
+    showSnackbar("success", "Ticket created successfully");
   };
 
   // ✅ UPDATE
@@ -89,6 +96,7 @@ const Tickets: React.FC = () => {
     setTickets(updated);
     setUpdateOpen(false);
     setForm({});
+    showSnackbar("success", "Ticket updated successfully");
   };
 
   const columns: ColumnsType<Ticket> = [
@@ -150,7 +158,7 @@ const Tickets: React.FC = () => {
 
       {/* 🔥 FILTER UI */}
       <Card style={{ marginBottom: 12 }}>
-        <Space>
+        <Space wrap>
           <Select
             placeholder="Select field"
             style={{ width: 180 }}
@@ -183,6 +191,7 @@ const Tickets: React.FC = () => {
           dataSource={filteredData}
           columns={columns}
           rowKey="key"
+          scroll={{ x: "max-content" }}
         />
       </Card>
 
