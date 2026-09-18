@@ -16,7 +16,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { foldersGet, processGet } from "../../redux/services/settings/branchServices";
 import { EnvironmentFetch } from "../../redux/services/settings/environmentService";
-import { AiTescases, TescasesGet, AiTestCasesCreate, AiTestCasesUpdate, ComponentDescriptionGet } from "../../redux/services/aitestcasesService";
+import { AiTescases, AiTestCasesCreate, AiTestCasesUpdate, ComponentDescriptionGet } from "../../redux/services/aitestcasesService";
 
 
 const { TextArea } = Input;
@@ -60,8 +60,6 @@ const AITestCases = () => {
     const [btnLoading, setBtnLoading] = useState(false);
     const [prompt, setPrompt] = useState("");
 
-    const [existingCheckLoading, setExistingCheckLoading] = useState(false);
-
     useEffect(() => {
         dispatch(foldersGet({ payload: {} }));
         dispatch(EnvironmentFetch());
@@ -74,49 +72,6 @@ const AITestCases = () => {
             dispatch(processGet({ payload: { "Folder id": selectedFolder } }));
         }
     }, [selectedFolder, dispatch]);
-
-    // ─── NEW: fetch existing test cases when folder, process & environment are selected ───
-    useEffect(() => {
-        const fetchExisting = async () => {
-            if (!selectedFolder || !selectedProcess || !selectedEnvironment) {
-                return;
-            }
-
-            setExistingCheckLoading(true);
-
-            try {
-                const res = await dispatch(
-                    TescasesGet({
-                        folder_id: selectedFolder,
-                        environment_id: selectedEnvironment,
-                        component_id: selectedProcess
-                    })
-                ).unwrap();
-
-                const results = res?.[0]?.Results || res?.Results || [];
-                if (Array.isArray(results) && results.length > 0) {
-                    const formatted = results.map((item: any, index: number) => ({
-                        key: item.id ?? index,
-                        id: item.test_case_id,
-                        description: item.description,
-                        expectedResult: item.expected_result,
-                        steps: item.steps_to_execute,
-                        isManual: false,
-                        test_case_gen_id: item.test_case_gen_id
-                    }));
-
-                    setTableData(formatted);
-                    setProcessName(results[0]?.process_name || "Generated Test Cases");
-                }
-            } catch (err) {
-                console.error(err);
-            } finally {
-                setExistingCheckLoading(false);
-            }
-        };
-
-        fetchExisting();
-    }, [selectedFolder, selectedProcess, selectedEnvironment, dispatch]);
 
     const flatFolders = useMemo(() => {
         const raw = Array.isArray(folderNames) ? folderNames[0] : folderNames;
@@ -537,7 +492,7 @@ const AITestCases = () => {
                 <Space style={{ marginTop: 10 }}>
                     <Button
                         type="primary"
-                        loading={btnLoading || existingCheckLoading}
+                        loading={btnLoading}
                         onClick={handleGenerate}
                         disabled={!selectedProcess || !prompt.trim()}
                     >
@@ -556,7 +511,7 @@ const AITestCases = () => {
                     )
                 }
             >
-                {loading || existingCheckLoading ? (
+                {loading ? (
                     <Spin />
                 ) : (
                     <>

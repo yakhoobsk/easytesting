@@ -17,31 +17,36 @@ const aiTestCaseApi = axios.create({
     headers: config.headersCommon,
 });
 
-boomiApi.interceptors.request.use(
-    async (configuration: any) => {
-        try {
-            const token = import.meta.env.VITE_BOOMI_BASIC_TOKEN;
-            if (token) {
-                setSecureItem("accessToken", token);
-            }
-            const encryptedToken = getSecureItem('accessToken');
-            configuration.headers = configuration.headers || {};
-            if (encryptedToken !== null) {
-                const decryptedToken = decryptIfNeeded(encryptedToken);
-                if (decryptedToken) {
-                    configuration.headers.Authorization = `Basic ${decryptedToken}` as string;
+const attachBoomiAuthInterceptor = (instance: any) => {
+    instance.interceptors.request.use(
+        async (configuration: any) => {
+            try {
+                const token = import.meta.env.VITE_BOOMI_BASIC_TOKEN;
+                if (token) {
+                    setSecureItem("accessToken", token);
                 }
+                const encryptedToken = getSecureItem('accessToken');
+                configuration.headers = configuration.headers || {};
+                if (encryptedToken !== null) {
+                    const decryptedToken = decryptIfNeeded(encryptedToken);
+                    if (decryptedToken) {
+                        configuration.headers.Authorization = `Basic ${decryptedToken}` as string;
+                    }
+                }
+            } catch (error) {
             }
-        } catch (error) {
+
+            return configuration;
+        },
+        (error: any) => {
+
+            return Promise.reject(error);
         }
+    );
+};
 
-        return configuration;
-    },
-    (error) => {
-
-        return Promise.reject(error);
-    }
-);
+attachBoomiAuthInterceptor(boomiApi);
+attachBoomiAuthInterceptor(aiTestCaseApi);
 
 const urlGenarator = (url: any, pagination: any) => {
     let queryString = "?";

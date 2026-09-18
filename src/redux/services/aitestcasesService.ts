@@ -111,7 +111,7 @@ export const AiTescases = createAsyncThunk(
         , { rejectWithValue }) => {
 
         try {
-            const response = await aiTestCaseApi.post("/api/test-cases/generate", payload);
+            const response = await aiTestCaseApi.post("/easytesting/AI-TestCases/generate", payload);
             return response.data;
         } catch (error: any) {
             return rejectWithValue(
