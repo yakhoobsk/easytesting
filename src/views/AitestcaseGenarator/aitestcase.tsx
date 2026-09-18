@@ -11,12 +11,11 @@ import {
 
 } from "antd";
 
-import { EditOutlined, SaveOutlined, CloseOutlined } from "@ant-design/icons";
 import { useState, useEffect, useMemo } from "react";
 import { useAppDispatch, useAppSelector } from "../../redux/hooks";
 import { foldersGet, processGet } from "../../redux/services/settings/branchServices";
 import { EnvironmentFetch } from "../../redux/services/settings/environmentService";
-import { AiTescases, AiTestCasesCreate, AiTestCasesUpdate, ComponentDescriptionGet } from "../../redux/services/aitestcasesService";
+import { AiTescases, AiTestCasesCreate, ComponentDescriptionGet } from "../../redux/services/aitestcasesService";
 
 
 const { TextArea } = Input;
@@ -52,9 +51,6 @@ const AITestCases = () => {
 
     const [tableData, setTableData] = useState<any>([]);
     const [selectedRowKeys, setSelectedRowKeys] = useState<any[]>([]);
-
-    const [editingKey, setEditingKey] = useState<any>(null);
-    const [editingRow, setEditingRow] = useState<any>(null);
 
     const [processName, setProcessName] = useState("");
     const [btnLoading, setBtnLoading] = useState(false);
@@ -213,63 +209,12 @@ const AITestCases = () => {
         }
     };
 
-    // ─── Edit handlers ───────────────────────────────────────────────
-    const handleEditStart = (record: any) => {
-        setEditingKey(record.key);
-        setEditingRow({ ...record });
-    };
-
-    const handleEditCancel = () => {
-        setEditingKey(null);
-        setEditingRow(null);
-    };
-
-    const handleEditSave = async (record: any) => {
-        if (!editingRow.id || !editingRow.description || !editingRow.expectedResult || !editingRow.steps) {
-            messageApi?.warning("Please fill all fields before saving");
-            return;
-        }
-
-        try {
-            await dispatch(
-                AiTestCasesUpdate({
-                    test_case_gen_id: editingRow.test_case_gen_id,
-                    Test_Case_Id: editingRow.id,
-                    Description: editingRow.description,
-                    Expected_Result: editingRow.expectedResult,
-                    Steps_To_Execute: editingRow.steps
-                })
-            ).unwrap();
-
-            const updated = tableData.map((row: any) =>
-                row.key === record.key ? { ...row, ...editingRow } : row
-            );
-            setTableData(updated);
-            setEditingKey(null);
-            setEditingRow(null);
-            messageApi?.success("Test case updated successfully");
-        } catch (err) {
-            console.error(err);
-            messageApi?.error("Failed to update test case");
-        }
-    };
-
-
-
     const columns = [
         {
             title: "Test Case",
             dataIndex: "id",
-            render: (text: any, record: any) => {
-                const isEditing = editingKey === record.key;
-                return isEditing ? (
-                    <Input
-                        value={editingRow?.id}
-                        onChange={(e) =>
-                            setEditingRow((prev: any) => ({ ...prev, id: e.target.value }))
-                        }
-                    />
-                ) : record.isManual ? (
+            render: (text: any, record: any) =>
+                record.isManual ? (
                     <Input
                         value={text}
                         onChange={(e) =>
@@ -278,22 +223,13 @@ const AITestCases = () => {
                     />
                 ) : (
                     text
-                );
-            }
+                )
         },
         {
             title: "Description",
             dataIndex: "description",
-            render: (text: any, record: any) => {
-                const isEditing = editingKey === record.key;
-                return isEditing ? (
-                    <Input
-                        value={editingRow?.description}
-                        onChange={(e) =>
-                            setEditingRow((prev: any) => ({ ...prev, description: e.target.value }))
-                        }
-                    />
-                ) : record.isManual ? (
+            render: (text: any, record: any) =>
+                record.isManual ? (
                     <Input
                         value={text}
                         onChange={(e) =>
@@ -302,22 +238,13 @@ const AITestCases = () => {
                     />
                 ) : (
                     text
-                );
-            }
+                )
         },
         {
             title: "Expected Result",
             dataIndex: "expectedResult",
-            render: (text: any, record: any) => {
-                const isEditing = editingKey === record.key;
-                return isEditing ? (
-                    <Input
-                        value={editingRow?.expectedResult}
-                        onChange={(e) =>
-                            setEditingRow((prev: any) => ({ ...prev, expectedResult: e.target.value }))
-                        }
-                    />
-                ) : record.isManual ? (
+            render: (text: any, record: any) =>
+                record.isManual ? (
                     <Input
                         value={text}
                         onChange={(e) =>
@@ -326,22 +253,13 @@ const AITestCases = () => {
                     />
                 ) : (
                     text
-                );
-            }
+                )
         },
         {
             title: "Steps",
             dataIndex: "steps",
-            render: (text: any, record: any) => {
-                const isEditing = editingKey === record.key;
-                return isEditing ? (
-                    <Input
-                        value={editingRow?.steps}
-                        onChange={(e) =>
-                            setEditingRow((prev: any) => ({ ...prev, steps: e.target.value }))
-                        }
-                    />
-                ) : record.isManual ? (
+            render: (text: any, record: any) =>
+                record.isManual ? (
                     <Input
                         value={text}
                         onChange={(e) =>
@@ -350,47 +268,7 @@ const AITestCases = () => {
                     />
                 ) : (
                     text
-                );
-            }
-        },
-        {
-            title: "Actions",
-            key: "actions",
-            width: 120,
-            render: (_: any, record: any) => {
-                const isEditing = editingKey === record.key;
-
-                return isEditing ? (
-                    <Space>
-                        <Button
-                            type="link"
-                            icon={<SaveOutlined />}
-                            onClick={() => handleEditSave(record)}
-                            style={{ color: "#52c41a", padding: 0 }}
-                            title="Save"
-                        />
-                        <Button
-                            type="link"
-                            icon={<CloseOutlined />}
-                            onClick={handleEditCancel}
-                            style={{ color: "#8c8c8c", padding: 0 }}
-                            title="Cancel"
-                        />
-                    </Space>
-                ) : (
-                    <Space>
-                        <Button
-                            type="link"
-                            icon={<EditOutlined />}
-                            onClick={() => handleEditStart(record)}
-                            disabled={!!editingKey}
-                            style={{ padding: 0 }}
-                            title="Edit"
-                        />
-
-                    </Space>
-                );
-            }
+                )
         }
     ];
 
